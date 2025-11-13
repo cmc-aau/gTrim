@@ -4,7 +4,7 @@ use std::path::Path;
 
 const DEFAULT_MAX_RESIDUE_PRUNED: u32 = 100;
 const DEFAULT_NUM_PERMUTATIONS: usize = 100;
-const DEFAULT_RESIDUES_TO_PRUNE: usize = 1;
+const DEFAULT_RESIDUES_TO_PRUNE_PERC: f64 = 1.0;
 const DEFAULT_NUM_THREADS: usize = 1;
 
 #[derive(Parser)]
@@ -20,11 +20,11 @@ pub struct Cli {
 #[derive(Subcommand)]
 pub enum Commands {
     /// Prune alignment based on chi-square test.
-    Prune(PruneArgs),
+    Chi2Prune(Chi2PruneArgs),
 }
 
 #[derive(Parser)]
-pub struct PruneArgs {
+pub struct Chi2PruneArgs {
     /// File containing the multiple sequence alignment.
     #[arg(long, value_parser = validate_input_file)]
     pub file: String,
@@ -37,13 +37,13 @@ pub struct PruneArgs {
     #[arg(long, default_value_t = DEFAULT_MAX_RESIDUE_PRUNED, value_parser = validate_max_residue_pruned)]
     pub max_residue_pruned: u32,
 
+    /// Percentage of top delta-chi2 columns to remove per iteration [0, 100]. Set to 0 to prune 1 column per iteration.
+    #[arg(long, default_value_t = DEFAULT_RESIDUES_TO_PRUNE_PERC, value_parser = validate_residues_to_prune_perc)]
+    pub residues_to_prune_perc: f64,
+
     /// Number of alignment permutations.
     #[arg(long, default_value_t = DEFAULT_NUM_PERMUTATIONS, value_parser = validate_permutations)]
     pub permutations: usize,
-
-    /// Number of top delta-chi2 columns to remove.
-    #[arg(long, default_value_t = DEFAULT_RESIDUES_TO_PRUNE, value_parser = validate_residues_to_prune)]
-    pub residues_to_prune: usize,
 
     /// Prunes columns until no significant reduction in compositional bias is observed.
     /// Recommend setting residues_to_prune to 1-2% of the original alignment length.
@@ -86,16 +86,16 @@ fn validate_max_residue_pruned(value: &str) -> Result<u32, String> {
     Ok(max_residue)
 }
 
-fn validate_residues_to_prune(value: &str) -> Result<usize, String> {
-    let residues: usize = value
+fn validate_residues_to_prune_perc(value: &str) -> Result<f64, String> {
+    let perc: f64 = value
         .parse()
         .map_err(|_| format!("`{value}` isn't a valid value"))?;
 
-    if residues == 0 {
-        return Err("Residues to prune must be greater than 0".to_string());
+    if !(0.0..=100.0).contains(&perc) {
+        return Err("Residues to prune percentage must be in the range [0, 100]".to_string());
     }
 
-    Ok(residues)
+    Ok(perc)
 }
 
 fn validate_permutations(value: &str) -> Result<usize, String> {

@@ -19,8 +19,9 @@ pub struct AlignmentPruner {
     file: String,
     max_residue_pruned: usize,
     permutations: usize,
-    residues_to_prune: usize,
+    residues_to_prune_perc: f64,
     initial_residues_to_prune: usize,
+    residues_to_prune: usize,
     touchdown: bool,
     threads_permutations: usize,
     alignment_size: usize,
@@ -42,7 +43,7 @@ impl AlignmentPruner {
         file: String,
         max_residue_pruned: usize,
         permutations: usize,
-        residues_to_prune: usize,
+        residues_to_prune_perc: f64,
         touchdown: bool,
         threads_permutations: usize,
     ) -> Self {
@@ -58,8 +59,9 @@ impl AlignmentPruner {
             file,
             max_residue_pruned,
             permutations,
-            residues_to_prune,
-            initial_residues_to_prune: residues_to_prune,
+            residues_to_prune_perc,
+            initial_residues_to_prune: 0,
+            residues_to_prune: 0,
             touchdown,
             threads_permutations,
             alignment_size: 0,
@@ -77,6 +79,14 @@ impl AlignmentPruner {
 
         let (is_dna, char_set) = SequenceTypeDetector::detect(&alignment)?;
         info!("Sequence type detected: {}", if is_dna { "DNA" } else { "amino acid" });
+
+        // determine initial residues to prune per iteration
+        self.initial_residues_to_prune = ((self.residues_to_prune_perc / 100.0) * alignment_array.ncols() as f64).floor() as usize;
+        if self.initial_residues_to_prune == 0 {
+            self.initial_residues_to_prune = 1;
+        }
+        self.residues_to_prune = self.initial_residues_to_prune;
+        info!("Initially columns to prune per iteration: {}", self.initial_residues_to_prune);
 
         let permutation_test = PermutationTest::new(self.threads_permutations, self.permutations);
         let chi_square_calculator = ChiSquareCalculator::new(char_set);
@@ -102,7 +112,9 @@ impl AlignmentPruner {
             format!("_p{}_s{}_m{}_pruned.fasta", self.permutations, self.initial_residues_to_prune, self.max_residue_pruned)
         };
 
-        let base_path = self.file.trim_end_matches(".faa").trim_end_matches(".fasta");
+        let base_path = self.file.trim_end_matches(".faa.gz").trim_end_matches(".faa")
+            .trim_end_matches(".fna.gz").trim_end_matches(".fna")
+            .trim_end_matches(".fasta").trim_end_matches(".fasta.gz");
         let output_alignment_file = format!("{}{}", base_path, suffix);
         let output_tsv_file = suffix.replace(".fasta", ".tsv");
         let output_tsv_file = format!("{}{}", base_path, output_tsv_file);
@@ -176,10 +188,8 @@ impl AlignmentPruner {
                 break;
             }
 
-            info!("1");
             let stats = self.calculate_per_row_stats(&alignment_array, chi_square_calculator);
 
-            info!("2");
             let (alignment_empirical_p, significant_count) = self.calc_empirical_pvals(
                 &stats,
                 sums,
@@ -191,7 +201,6 @@ impl AlignmentPruner {
                 score_dict.before_real = stats.per_row_chi2.clone();
             } else {
                 // Record pruned columns
-                info!("3");
                 for &(col, chi2_diff) in &residues_to_prune_indices {
                     let pruned_col = original_indices[col];
                     prune_dict.insert(
@@ -209,7 +218,6 @@ impl AlignmentPruner {
                 }
 
                 // Update original indices - remove pruned columns
-                info!("4");
                 let cols_to_remove: HashSet<usize> = residues_to_prune_indices.iter().map(|(c, _)| *c).collect();
                 let mut new_indices = Vec::with_capacity(original_indices.len() - cols_to_remove.len());
                 for (j, &idx) in original_indices.iter().enumerate() {
@@ -220,7 +228,6 @@ impl AlignmentPruner {
                 original_indices = new_indices;
             }
 
-            info!("5");
             let (should_stop, stop_reason) = self.check_stopping_criteria(
                 &stats,
                 permutated_per_row_chi2,
@@ -230,8 +237,9 @@ impl AlignmentPruner {
 
             if let Some(pb) = &self.progress {
                 pb.set_message(format!(
-                    "Iteration: {} | Columns removed: {} ({:.2}%) | Biased taxa: {} | Mean Z-score: {:.2} | q95 Z-score: {:.2} | Alignment p-value: {:.2}",
+                    "Iteration: {} | Columns removed: {} | Total columns removed: {} ({:.2}%) | Biased taxa: {} | Mean Z-score: {:.2} | q95 Z-score: {:.2} | Alignment p-value: {:.2}",
                     iteration,
+                    self.residues_to_prune,
                     removed_columns_count,
                     (removed_columns_count as f64 / self.alignment_size as f64) * 100.0,
                     significant_count,
@@ -254,7 +262,6 @@ impl AlignmentPruner {
             }
 
             // Calculate chi2 differences for pruning
-            info!("6");
             let chi2_differences = self.prune_quartic(
                 &stats.count_rows,
                 &stats.expected_observed,
@@ -262,13 +269,11 @@ impl AlignmentPruner {
                 chi_square_calculator,
             );
 
-            info!("7");
             initial_global_chi2 = chi_square_calculator
                 .calculate_quartic_row_global_chi2(&stats.expected_observed, &stats.count_rows);
 
             // Sort columns by chi2 difference and get top N
             // Use index as secondary sort key for deterministic ordering
-            info!("8");
             let mut diff_vec: Vec<(usize, f64)> = chi2_differences.into_iter().collect();
             diff_vec.sort_by(|a, b| {
                 a.1.partial_cmp(&b.1)
@@ -276,13 +281,11 @@ impl AlignmentPruner {
                     .then_with(|| a.0.cmp(&b.0))
             });
 
-            info!("9");
             let num_to_remove = self.residues_to_prune.min(diff_vec.len());
             residues_to_prune_indices = diff_vec[diff_vec.len() - num_to_remove..].to_vec();
             residues_to_prune_indices.sort_by(|a, b| a.0.cmp(&b.0));
 
             // Remove all columns in a single pass
-            info!("10");
             let cols_to_remove: Vec<usize> = residues_to_prune_indices.iter().map(|(idx, _)| *idx).collect();
             alignment_array = remove_columns(&alignment_array, &cols_to_remove);
 
@@ -304,11 +307,9 @@ impl AlignmentPruner {
         alignment_array: &Array2<char>,
         chi_square_calculator: &ChiSquareCalculator,
     ) -> HashMap<usize, f64> {
-        info!("6a");
         let initial_global_chi2 = chi_square_calculator
             .calculate_quartic_row_global_chi2(expected_observed, count_rows_array);
 
-        info!("6b");
         chi_square_calculator.calculate_quartic_chi2_difference(
             count_rows_array,
             alignment_array,
@@ -359,15 +360,12 @@ impl AlignmentPruner {
         permuted_chi2: &[f64],
         permutation_test: &PermutationTest,
     ) -> (f64, usize) {
-        info!("2a");
         let alignment_empirical_p =
             permutation_test.calc_empirical_pvalue(&[stats.sum], permuted_sums)[0];
 
-        info!("2b");
         let empirical_pvals =
             permutation_test.calc_empirical_pvalue(&stats.per_row_chi2, permuted_chi2);
 
-        info!("2c");
         let significant_count = empirical_pvals.iter().filter(|&&p| p <= 0.05).count();
 
         (alignment_empirical_p, significant_count)
