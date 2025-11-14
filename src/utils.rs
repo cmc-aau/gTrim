@@ -73,6 +73,30 @@ pub fn write_pruned_dict_to_tsv(
     Ok(())
 }
 
+/// Write binary mask where 1 indicate a column is retained and 0 indicates it was pruned.
+pub fn write_mask(
+    prune_dict: &HashMap<usize, PruneInfo>,
+    num_cols: usize,
+    file_name: &str,
+) -> Result<()> {
+    let mut mask = vec![1; num_cols];
+
+    for info in prune_dict.values() {
+        if info.original_index < num_cols {
+            mask[info.original_index] = 0;
+        }
+    }
+
+    let mask_string: String = mask.into_iter().map(|i| i.to_string()).collect();
+
+    let mut file =
+        File::create(file_name).with_context(|| format!("Failed to create file: {}", file_name))?;
+
+    writeln!(file, "{}", mask_string)?;
+
+    Ok(())
+}
+
 /// Score dictionary structure for JSON output
 #[derive(Debug, Serialize, Deserialize)]
 pub struct ScoreDict {

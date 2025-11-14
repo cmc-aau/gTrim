@@ -11,7 +11,7 @@ use crate::chi_square_calculator::ChiSquareCalculator;
 use crate::permutation_test::PermutationTest;
 use crate::sequence_type_detector::SequenceTypeDetector;
 use crate::utils::{
-    make_score_dict, write_alignment, write_pruned_dict_to_tsv, write_score_dict_to_json,
+    make_score_dict, write_alignment, write_pruned_dict_to_tsv, write_mask, write_score_dict_to_json,
     write_score_dict_to_tsv, PruneInfo, ScoreDict,
 };
 
@@ -23,7 +23,9 @@ pub struct AlignmentPruner {
     initial_residues_to_prune: usize,
     residues_to_prune: usize,
     touchdown: bool,
+    rapid_convergence: bool,
     threads_permutations: usize,
+    out_dir: Option<String>,
     alignment_size: usize,
     progress: Option<ProgressBar>,
 }
@@ -39,13 +41,16 @@ struct PerRowStats {
 }
 
 impl AlignmentPruner {
+    #[allow(clippy::too_many_arguments)]
     pub fn new(
         file: String,
         max_residue_pruned: usize,
-        permutations: usize,
         residues_to_prune_perc: f64,
+        permutations: usize,
         touchdown: bool,
+        rapid_convergence: bool,
         threads_permutations: usize,
+        out_dir: Option<String>,
     ) -> Self {
         let pb = ProgressBar::new_spinner();
         pb.set_style(
@@ -63,7 +68,9 @@ impl AlignmentPruner {
             initial_residues_to_prune: 0,
             residues_to_prune: 0,
             touchdown,
+            rapid_convergence,
             threads_permutations,
+            out_dir,
             alignment_size: 0,
             progress: Some(pb),
         }
@@ -75,13 +82,14 @@ impl AlignmentPruner {
         info!("Reading alignment from file: {}", self.file);
         let reader = AlignmentReader::new(self.file.clone());
         let (alignment, alignment_array) = reader.run()?;
-        info!("Alignment contains {} sequences and {} columns.", alignment.len(), alignment_array.ncols());
+        let num_cols_orig = alignment_array.ncols();
+        info!("Alignment contains {} sequences and {} columns.", alignment.len(), num_cols_orig);
 
         let (is_dna, char_set) = SequenceTypeDetector::detect(&alignment)?;
         info!("Sequence type detected: {}", if is_dna { "DNA" } else { "amino acid" });
 
         // determine initial residues to prune per iteration
-        self.initial_residues_to_prune = ((self.residues_to_prune_perc / 100.0) * alignment_array.ncols() as f64).floor() as usize;
+        self.initial_residues_to_prune = ((self.residues_to_prune_perc / 100.0) * num_cols_orig as f64).floor() as usize;
         if self.initial_residues_to_prune == 0 {
             self.initial_residues_to_prune = 1;
         }
@@ -108,19 +116,54 @@ impl AlignmentPruner {
         // Write outputs
         let suffix = if self.touchdown {
             format!("_p{}_s{}_m{}_touchdown_pruned.fasta", self.permutations, self.initial_residues_to_prune, self.max_residue_pruned)
+        } else if self.rapid_convergence {
+            format!("_p{}_s{}_m{}_rapid_pruned.fasta", self.permutations, self.initial_residues_to_prune, self.max_residue_pruned)
         } else {
             format!("_p{}_s{}_m{}_pruned.fasta", self.permutations, self.initial_residues_to_prune, self.max_residue_pruned)
         };
 
-        let base_path = self.file.trim_end_matches(".faa.gz").trim_end_matches(".faa")
-            .trim_end_matches(".fna.gz").trim_end_matches(".fna")
-            .trim_end_matches(".fasta").trim_end_matches(".fasta.gz");
+        let base_path = if let Some(out_dir) = &self.out_dir {
+            // create output directory if it doesn't already exist
+            std::fs::create_dir_all(out_dir)
+                .map_err(|e| anyhow::anyhow!("Failed to create output directory '{}': {}", out_dir, e))?;
+
+            // get the filename from the input path (error if missing or non-UTF8)
+            let mut filename = std::path::Path::new(&self.file)
+                .file_name()
+                .and_then(|name| name.to_str())
+                .ok_or_else(|| anyhow::anyhow!("Input path '{}' does not contain a valid filename", self.file))?;
+
+            // create owned stem and strip known extensions
+            filename = filename
+                .trim_end_matches(".gz")
+                .trim_end_matches(".faa")
+                .trim_end_matches(".fna")
+                .trim_end_matches(".fasta");
+
+            // join output directory with the sanitized stem and return as String
+            std::path::Path::new(out_dir)
+                .join(filename)
+                .to_string_lossy()
+                .into_owned()
+        } else {
+            self.file
+                .trim_end_matches(".gz")
+                .trim_end_matches(".faa")
+                .trim_end_matches(".fna")
+                .trim_end_matches(".fasta")
+                .to_string()
+        };
+
         let output_alignment_file = format!("{}{}", base_path, suffix);
+        write_alignment(&alignment, &pruned_alignment_array, &output_alignment_file)?;
+
         let output_tsv_file = suffix.replace(".fasta", ".tsv");
         let output_tsv_file = format!("{}{}", base_path, output_tsv_file);
-
-        write_alignment(&alignment, &pruned_alignment_array, &output_alignment_file)?;
         write_pruned_dict_to_tsv(&prune_dict, &output_tsv_file)?;
+
+        let output_mask_file = suffix.replace(".fasta", ".mask");
+        let output_mask_file = format!("{}{}", base_path, output_mask_file);
+        write_mask(&prune_dict, num_cols_orig, &output_mask_file)?;
 
         // Calculate and write empirical p-values
         let empirical_pvalues = permutation_test.calc_empirical_pvalue(
@@ -143,6 +186,7 @@ impl AlignmentPruner {
         let output_json_file = format!("{}{}", base_path, output_json_file);
         write_score_dict_to_json(&score_dict, &output_json_file)?;
 
+        info!("Pruned {} columns.", prune_dict.len());
         info!("Taxa p-values and z-scores printed to {}", output_score_tsv_file);
         info!("Chiscore values from permutation testing printed to {}", output_json_file);
 
@@ -233,6 +277,7 @@ impl AlignmentPruner {
                 permutated_per_row_chi2,
                 alignment_empirical_p,
                 significant_count,
+                alignment_array.ncols(),
             );
 
             if let Some(pb) = &self.progress {
@@ -323,6 +368,7 @@ impl AlignmentPruner {
         permuted_chi2: &[f64],
         alignment_empirical_p: f64,
         significant_count: usize,
+        cur_alignment_len: usize,
     ) -> (bool, String) {
         if self.touchdown {
             let mut sorted_perm = permuted_chi2.to_vec();
@@ -335,11 +381,13 @@ impl AlignmentPruner {
                 if new_residues_to_prune < self.residues_to_prune {
                     self.residues_to_prune = new_residues_to_prune;
                 }
-
-                if self.residues_to_prune == 0 {
-                    self.residues_to_prune = 1;
-                }
             }
+        } else if self.rapid_convergence {
+            self.residues_to_prune = ((self.residues_to_prune_perc / 100.0) * (cur_alignment_len as f64)).floor() as usize;
+        }
+
+        if self.residues_to_prune == 0 {
+            self.residues_to_prune = 1;
         }
 
         if alignment_empirical_p >= 0.95 {

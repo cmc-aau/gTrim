@@ -4,7 +4,6 @@ use ndarray::Array2;
 use rand::prelude::*;
 use rand_chacha::ChaCha8Rng;
 use rayon::prelude::*;
-use log::info;
 
 use crate::chi_square_calculator::ChiSquareCalculator;
 use crate::progress::progress_bar;
@@ -77,9 +76,6 @@ impl PermutationTest {
             (0..self.permutations)
                 .into_par_iter()
                 .map(|i| {
-                    // Clone Arc for this thread/closure
-                    let pb = pb.clone();
-
                     // Use fixed seed for reproducibility
                     let seed = 12345u64 + i as u64;
                     let mut rng = ChaCha8Rng::seed_from_u64(seed);
@@ -105,6 +101,7 @@ impl PermutationTest {
                     let per_row_chi2 = chi_square_calculator.calculate_row_chi2(&expected_observed, &count_rows_array);
 
                     // Increment progress bar
+                    let pb = pb.clone();
                     pb.inc(1);
 
                     per_row_chi2
@@ -112,11 +109,9 @@ impl PermutationTest {
                 .collect()
         });
 
-        info!("Result has {} rows and {} columns", results.len(), results[0].len());
-
         // Finish progress bar
         Arc::try_unwrap(pb)
-            .map(|pb| pb.finish_with_message("Permutations complete"))
+            .map(|pb| pb.finish())
             .ok();
 
         results

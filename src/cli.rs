@@ -2,7 +2,7 @@ use clap::{Parser, Subcommand};
 use std::path::Path;
 
 
-const DEFAULT_MAX_RESIDUE_PRUNED: u32 = 100;
+const DEFAULT_MAX_RESIDUE_PRUNED: usize = 100000;
 const DEFAULT_NUM_PERMUTATIONS: usize = 100;
 const DEFAULT_RESIDUES_TO_PRUNE_PERC: f64 = 1.0;
 const DEFAULT_NUM_THREADS: usize = 1;
@@ -26,16 +26,17 @@ pub enum Commands {
 #[derive(Parser)]
 pub struct Chi2PruneArgs {
     /// File containing the multiple sequence alignment.
-    #[arg(long, value_parser = validate_input_file)]
+    #[arg(long, value_parser = validate_input_file, required = true)]
     pub file: String,
 
-    /// Multiple sequence alignment format.
-    #[arg(long, default_value = "fasta", value_parser = validate_format)]
-    pub format: String,
+    /// Output directory.If not specified, output files will be written 
+    /// to the same directory as the input file.
+    #[arg(long)]
+    pub out_dir: Option<String>,
 
     /// Maximum number of columns to prune.
     #[arg(long, default_value_t = DEFAULT_MAX_RESIDUE_PRUNED, value_parser = validate_max_residue_pruned)]
-    pub max_residue_pruned: u32,
+    pub max_residue_pruned: usize,
 
     /// Percentage of top delta-chi2 columns to remove per iteration [0, 100]. Set to 0 to prune 1 column per iteration.
     #[arg(long, default_value_t = DEFAULT_RESIDUES_TO_PRUNE_PERC, value_parser = validate_residues_to_prune_perc)]
@@ -46,11 +47,18 @@ pub struct Chi2PruneArgs {
     pub permutations: usize,
 
     /// Prunes columns until no significant reduction in compositional bias is observed.
-    /// Recommend setting residues_to_prune to 1-2% of the original alignment length.
-    /// The number of columns to prune will be reduced to 0.1% of the original alignment length
-    /// per iteration after a threshold of 99.0% is reached.
-    #[arg(long)]
+    /// Recommend setting residues_to_prune_perc to 1-2%. The number of columns to prune 
+    /// will be reduced to 0.1% of the original alignment length per iteration after a 
+    /// threshold of 99.0% is reached.
+    #[arg(long, conflicts_with = "rapid_convergence")]
     pub touchdown: bool,
+
+    /// Prunes columns until no significant reduction in compositional bias is observed.
+    /// Recommend setting residues_to_prune_perc to 1-2%. The number of columns pruned
+    /// is always residues_to_prune_perc multipled by the length of the remaining 
+    /// alignment. This will generally converge faster than touchdown mode.
+    #[arg(long, conflicts_with = "touchdown")]
+    pub rapid_convergence: bool,
 
     /// Number of threads to use when calculating permutations. Threads replicate the alignment in memory,
     /// which results in higher peak memory requirements.
@@ -74,8 +82,8 @@ fn validate_threads(threads: &str) -> Result<usize, String> {
     Ok(threads)
 }
 
-fn validate_max_residue_pruned(value: &str) -> Result<u32, String> {
-    let max_residue: u32 = value
+fn validate_max_residue_pruned(value: &str) -> Result<usize, String> {
+    let max_residue: usize = value
         .parse()
         .map_err(|_| format!("`{value}` isn't a valid value"))?;
 
@@ -108,13 +116,6 @@ fn validate_permutations(value: &str) -> Result<usize, String> {
     }
 
     Ok(perms)
-}
-
-fn validate_format(format: &str) -> Result<String, String> {
-    match format.to_lowercase().as_str() {
-        "fasta" => Ok(format.to_string()),
-        _ => Err("Only FASTA format is currently supported".to_string()),
-    }
 }
 
 fn validate_input_file(file: &str) -> Result<String, String> {

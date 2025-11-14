@@ -46,11 +46,13 @@ fn main() -> Result<()> {
 
             let mut pruner = alignment_pruner::AlignmentPruner::new(
                 args.file.clone(),
-                args.max_residue_pruned as usize,
-                args.permutations,
+                args.max_residue_pruned,
                 args.residues_to_prune_perc,
+                args.permutations,
                 args.touchdown,
+                args.rapid_convergence,
                 args.threads_permutations,
+                args.out_dir.clone(),
             );
 
             if let Err(e) = pruner.run() {
