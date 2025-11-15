@@ -5,8 +5,8 @@ use rand::prelude::*;
 use rand_chacha::ChaCha8Rng;
 use rayon::prelude::*;
 
-use crate::chi_square_calculator::ChiSquareCalculator;
 use crate::progress::progress_bar;
+use super::chi_square_calculator::ChiSquareCalculator;
 
 pub struct PermutationTest {
     pool: rayon::ThreadPool,

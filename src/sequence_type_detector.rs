@@ -4,6 +4,7 @@ use std::collections::HashSet;
 
 use crate::alignment_reader::SeqRecord;
 
+pub const GAP_CHARS: [char; 2] = ['-', '.'];
 pub const DNA_BASES: [char; 4] = ['A', 'C', 'G', 'T'];
 pub const AMINO_ACIDS: [char; 20] = [
     'A', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'K', 'L',
@@ -38,7 +39,7 @@ impl SequenceTypeDetector {
         seq_set.retain(|c| !chars_to_remove.contains(c));
 
         if seq_set.is_empty() {
-            warn!("⚠️  Could not detect sequence type: all residues were ambiguous or removed.");
+            warn!("⚠️ Could not detect sequence type: all residues were ambiguous or removed.");
             bail!("No valid sequence characters detected.");
         }
 

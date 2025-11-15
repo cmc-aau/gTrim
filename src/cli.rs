@@ -1,6 +1,7 @@
 use clap::{Parser, Subcommand};
 use std::path::Path;
 
+const DEFAULT_GAP_THRESHOLD: f64 = 100.0;
 
 const DEFAULT_MAX_RESIDUE_PRUNED: usize = 100000;
 const DEFAULT_NUM_PERMUTATIONS: usize = 100;
@@ -19,20 +20,45 @@ pub struct Cli {
 
 #[derive(Subcommand)]
 pub enum Commands {
-    /// Prune alignment based on chi-square test.
-    Chi2Prune(Chi2PruneArgs),
+    /// Prune columns based on gap threshold
+    PruneGap(PruneGapArgs),
+
+    /// Prune columns based on chi-square test.
+    PruneChi2(PruneChi2Args),
 }
 
 #[derive(Parser)]
-pub struct Chi2PruneArgs {
+pub struct PruneGapArgs {
     /// File containing the multiple sequence alignment.
     #[arg(long, value_parser = validate_input_file, required = true)]
     pub file: String,
 
-    /// Output directory.If not specified, output files will be written 
-    /// to the same directory as the input file.
-    #[arg(long)]
-    pub out_dir: Option<String>,
+    /// Output directory.
+    #[arg(long, required = true)]
+    pub out_dir: String,
+
+    /// Maximum percentage of gaps to retain column.
+    #[arg(long, default_value_t = DEFAULT_GAP_THRESHOLD, value_parser = validate_gap_threshold)]
+    pub gap_threshold: f64,
+
+    /// Maximum number of columns to prune.
+    #[arg(long, default_value_t = DEFAULT_MAX_RESIDUE_PRUNED, value_parser = validate_max_residue_pruned)]
+    pub max_residue_pruned: usize,
+
+    /// Number of threads to use for pruning columns.
+    #[arg(long, default_value_t = DEFAULT_NUM_THREADS, value_parser = validate_threads)]
+    pub threads: usize,
+}
+
+#[derive(Parser)]
+pub struct PruneChi2Args {
+    /// File containing the multiple sequence alignment.
+    #[arg(long, value_parser = validate_input_file, required = true)]
+    pub file: String,
+
+    /// Output directory.
+    #[arg(long, required = true)]
+    pub out_dir: String,
 
     /// Maximum number of columns to prune.
     #[arg(long, default_value_t = DEFAULT_MAX_RESIDUE_PRUNED, value_parser = validate_max_residue_pruned)]
@@ -68,6 +94,18 @@ pub struct Chi2PruneArgs {
     /// Number of threads to use for pruning columns.
     #[arg(long, default_value_t = DEFAULT_NUM_THREADS, value_parser = validate_threads)]
     pub threads_pruning: usize,
+}
+
+fn validate_gap_threshold(value: &str) -> Result<f64, String> {
+    let perc: f64 = value
+        .parse()
+        .map_err(|_| format!("`{value}` isn't a valid value"))?;
+
+    if !(0.0..=100.0).contains(&perc) {
+        return Err("Gap threshold must be in the range [0, 100]".to_string());
+    }
+
+    Ok(perc)
 }
 
 fn validate_threads(threads: &str) -> Result<usize, String> {

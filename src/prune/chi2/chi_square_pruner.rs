@@ -6,16 +6,17 @@ use ndarray::Array2;
 use indicatif::{ProgressBar, ProgressStyle};
 use rayon::iter::{ParallelIterator, IntoParallelIterator};
 
-use crate::alignment_reader::AlignmentReader;
-use crate::chi_square_calculator::ChiSquareCalculator;
-use crate::permutation_test::PermutationTest;
 use crate::sequence_type_detector::SequenceTypeDetector;
-use crate::utils::{
+use crate::alignment_reader::AlignmentReader;
+
+use super::chi_square_calculator::ChiSquareCalculator;
+use super::permutation_test::PermutationTest;
+use super::utils::{
     make_score_dict, write_alignment, write_pruned_dict_to_tsv, write_mask, write_score_dict_to_json,
     write_score_dict_to_tsv, PruneInfo, ScoreDict,
 };
 
-pub struct AlignmentPruner {
+pub struct ChiSquarePruner {
     file: String,
     max_residue_pruned: usize,
     permutations: usize,
@@ -25,7 +26,7 @@ pub struct AlignmentPruner {
     touchdown: bool,
     rapid_convergence: bool,
     threads_permutations: usize,
-    out_dir: Option<String>,
+    out_dir: String,
     alignment_size: usize,
     progress: Option<ProgressBar>,
 }
@@ -40,7 +41,7 @@ struct PerRowStats {
     sum: f64,
 }
 
-impl AlignmentPruner {
+impl ChiSquarePruner {
     #[allow(clippy::too_many_arguments)]
     pub fn new(
         file: String,
@@ -50,7 +51,7 @@ impl AlignmentPruner {
         touchdown: bool,
         rapid_convergence: bool,
         threads_permutations: usize,
-        out_dir: Option<String>,
+        out_dir: String,
     ) -> Self {
         let pb = ProgressBar::new_spinner();
         pb.set_style(
@@ -77,7 +78,7 @@ impl AlignmentPruner {
     }
 
     pub fn run(&mut self) -> Result<()> {
-        info!("Starting pruning workflow.");
+        info!("Starting chi squared pruning workflow.");
         
         info!("Reading alignment from file: {}", self.file);
         let reader = AlignmentReader::new(self.file.clone());
@@ -112,6 +113,7 @@ impl AlignmentPruner {
             upper_threshold,
             &permutated_per_row_chi2,
         )?;
+        info!("Pruned {} columns.", prune_dict.len());
 
         // Write outputs
         let suffix = if self.touchdown {
@@ -122,37 +124,24 @@ impl AlignmentPruner {
             format!("_p{}_s{}_m{}_pruned.fasta", self.permutations, self.initial_residues_to_prune, self.max_residue_pruned)
         };
 
-        let base_path = if let Some(out_dir) = &self.out_dir {
-            // create output directory if it doesn't already exist
-            std::fs::create_dir_all(out_dir)
-                .map_err(|e| anyhow::anyhow!("Failed to create output directory '{}': {}", out_dir, e))?;
+        // get the filename from the input path (error if missing or non-UTF8)
+        let mut filename = std::path::Path::new(&self.file)
+            .file_name()
+            .and_then(|name| name.to_str())
+            .ok_or_else(|| anyhow::anyhow!("Input path '{}' does not contain a valid filename", self.file))?;
 
-            // get the filename from the input path (error if missing or non-UTF8)
-            let mut filename = std::path::Path::new(&self.file)
-                .file_name()
-                .and_then(|name| name.to_str())
-                .ok_or_else(|| anyhow::anyhow!("Input path '{}' does not contain a valid filename", self.file))?;
+        // create owned stem and strip known extensions
+        filename = filename
+            .trim_end_matches(".gz")
+            .trim_end_matches(".faa")
+            .trim_end_matches(".fna")
+            .trim_end_matches(".fasta");
 
-            // create owned stem and strip known extensions
-            filename = filename
-                .trim_end_matches(".gz")
-                .trim_end_matches(".faa")
-                .trim_end_matches(".fna")
-                .trim_end_matches(".fasta");
-
-            // join output directory with the sanitized stem and return as String
-            std::path::Path::new(out_dir)
-                .join(filename)
-                .to_string_lossy()
-                .into_owned()
-        } else {
-            self.file
-                .trim_end_matches(".gz")
-                .trim_end_matches(".faa")
-                .trim_end_matches(".fna")
-                .trim_end_matches(".fasta")
-                .to_string()
-        };
+        // join output directory with the sanitized stem and return as String
+        let base_path = std::path::Path::new(&self.out_dir)
+            .join(filename)
+            .to_string_lossy()
+            .into_owned();
 
         let output_alignment_file = format!("{}{}", base_path, suffix);
         write_alignment(&alignment, &pruned_alignment_array, &output_alignment_file)?;
@@ -186,7 +175,6 @@ impl AlignmentPruner {
         let output_json_file = format!("{}{}", base_path, output_json_file);
         write_score_dict_to_json(&score_dict, &output_json_file)?;
 
-        info!("Pruned {} columns.", prune_dict.len());
         info!("Taxa p-values and z-scores printed to {}", output_score_tsv_file);
         info!("Chiscore values from permutation testing printed to {}", output_json_file);
 

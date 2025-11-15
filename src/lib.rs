@@ -1,9 +1,6 @@
-pub mod alignment_pruner;
 pub mod alignment_reader;
-pub mod chi_square_calculator;
 pub mod cli;
 pub mod logging;
-pub mod permutation_test;
 pub mod progress;
+pub mod prune;
 pub mod sequence_type_detector;
-pub mod utils;

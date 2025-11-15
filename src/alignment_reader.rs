@@ -46,7 +46,7 @@ impl AlignmentReader {
         Ok(records)
     }
 
-    /// Convert alignment to 2D numpy-like array
+    /// Convert alignment to 2D array
     fn make_alignment_array(&self, alignment: &[SeqRecord]) -> Result<Array2<char>> {
         if alignment.is_empty() {
             anyhow::bail!("Cannot create array from empty alignment");
