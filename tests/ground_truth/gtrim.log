@@ -1,0 +1,22 @@
+[2025-11-17 01:33:24] INFO: gtrim v0.1.0
+[2025-11-17 01:33:24] INFO: ./target/release/gtrim prune-gap --file ./tests/input_file/gap_test.fna.gz --out-dir ./tests/ground_truth/ --gap-threshold 50
+[2025-11-17 01:33:24] INFO: Using 1 threads.
+[2025-11-17 01:33:24] INFO: Starting gap pruning workflow.
+[2025-11-17 01:33:24] INFO: Reading alignment from file: ./tests/input_file/gap_test.fna.gz
+[2025-11-17 01:33:24] INFO: Alignment contains 10 sequences and 22 columns.
+[2025-11-17 01:33:24] INFO: Sequence type detected: DNA
+[2025-11-17 01:33:24] INFO: Pruning gappy columns.
+[2025-11-17 01:33:24] INFO: Pruned 10 columns.
+[2025-11-17 01:33:24] INFO: Writing filtered alignment to file.
+[2025-11-17 01:33:24] INFO: Execution time: 0.02 seconds
+[2025-11-17 01:38:26] INFO: gtrim v0.1.0
+[2025-11-17 01:38:26] INFO: ./target/release/gtrim prune-gap --file ./tests/input_file/gap_test.fna.gz --out-dir ./tests/ground_truth/ --gap-threshold 50
+[2025-11-17 01:38:26] INFO: Using 1 threads.
+[2025-11-17 01:38:26] INFO: Starting gap pruning workflow.
+[2025-11-17 01:38:26] INFO: Reading alignment from file: ./tests/input_file/gap_test.fna.gz
+[2025-11-17 01:38:26] INFO: Alignment contains 10 sequences and 22 columns.
+[2025-11-17 01:38:26] INFO: Sequence type detected: DNA
+[2025-11-17 01:38:26] INFO: Pruning gappy columns.
+[2025-11-17 01:38:26] INFO: Pruned 10 columns.
+[2025-11-17 01:38:26] INFO: Writing filtered alignment to file.
+[2025-11-17 01:38:26] INFO: Execution time: 0.02 seconds
