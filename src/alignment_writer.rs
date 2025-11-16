@@ -3,8 +3,8 @@ use std::io::{Write, BufWriter};
 
 use anyhow::{Context, Result};
 use ndarray::Array2;
-use flate2::write::GzEncoder;
-use flate2::Compression;
+use gzp::{deflate::Gzip, ZBuilder};
+use rayon::current_num_threads;
 
 
 /// Check if input file is compressed.
@@ -55,7 +55,8 @@ pub fn write_filtered_alignment(
         .with_context(|| format!("Failed to create file: {}", out_path))?;
 
     let mut writer: Box<dyn Write> = if compress {
-        Box::new(GzEncoder::new(file, Compression::default()))
+        let num_threads = current_num_threads();
+        Box::new(ZBuilder::<Gzip, _>::new().num_threads(num_threads).from_writer(file))
     } else {
         Box::new(BufWriter::new(file))
     };

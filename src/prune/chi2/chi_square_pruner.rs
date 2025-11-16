@@ -13,7 +13,7 @@ use crate::progress::spinner;
 
 use super::chi_square_calculator::ChiSquareCalculator;
 use super::permutation_test::PermutationTest;
-use super::utils::{
+use super::chi_square_writer::{
     make_score_dict, write_alignment, write_pruned_dict_to_tsv, write_mask, write_score_dict_to_json,
     write_score_dict_to_tsv, PruneInfo, ScoreDict,
 };
