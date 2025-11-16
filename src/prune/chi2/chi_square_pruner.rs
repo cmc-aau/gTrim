@@ -19,7 +19,7 @@ use super::chi_square_writer::{
 };
 
 pub struct ChiSquarePruner {
-    file: String,
+    alignment_file: String,
     max_residue_pruned: usize,
     permutations: usize,
     residues_to_prune_perc: f64,
@@ -46,7 +46,7 @@ struct PerRowStats {
 impl ChiSquarePruner {
     #[allow(clippy::too_many_arguments)]
     pub fn new(
-        file: String,
+        alignment_file: String,
         max_residue_pruned: usize,
         residues_to_prune_perc: f64,
         permutations: usize,
@@ -56,7 +56,7 @@ impl ChiSquarePruner {
         out_dir: String,
     ) -> Self {
         Self {
-            file,
+            alignment_file,
             max_residue_pruned,
             permutations,
             residues_to_prune_perc,
@@ -74,8 +74,8 @@ impl ChiSquarePruner {
     pub fn run(&mut self) -> Result<()> {
         info!("Starting chi squared pruning workflow.");
         
-        info!("Reading alignment from file: {}", self.file);
-        let reader = AlignmentReader::new(self.file.clone());
+        info!("Reading alignment from file: {}", self.alignment_file);
+        let reader = AlignmentReader::new(self.alignment_file.clone());
         let (seq_ids, alignment_array) = reader.run()?;
         let num_cols_orig = alignment_array.ncols();
         info!("Alignment contains {} sequences and {} columns.", seq_ids.len(), num_cols_orig);
@@ -110,7 +110,7 @@ impl ChiSquarePruner {
         info!("Pruned {} columns.", prune_dict.len());
 
         // Write outputs
-        let output_prefix = get_output_prefix(&self.file, &self.out_dir)?;
+        let output_prefix = get_output_prefix(&self.alignment_file, &self.out_dir)?;
         let output_suffix = if self.touchdown {
             format!("_p{}_s{}_m{}_touchdown_pruned.fasta", self.permutations, self.initial_residues_to_prune, self.max_residue_pruned)
         } else if self.rapid_convergence {
@@ -150,7 +150,7 @@ impl ChiSquarePruner {
 
         info!("Writing filtered alignment to file.");
         let output_alignment_file = format!("{}{}", output_prefix, output_suffix);
-        let compressed = check_compressed_input(&self.file);
+        let compressed = check_compressed_input(&self.alignment_file);
         write_alignment(&seq_ids, &pruned_alignment_array, &output_alignment_file, compressed)?;
 
         Ok(())

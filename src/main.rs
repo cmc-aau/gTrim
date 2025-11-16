@@ -7,9 +7,10 @@ use clap::Parser;
 use anyhow::Result;
 
 use gtrim::logging;
-use gtrim::cli::{Cli, Commands, PruneGapArgs, PruneChi2Args};
+use gtrim::cli;
 use gtrim::prune::gap::gap_pruner;
 use gtrim::prune::chi2::chi_square_pruner;
+use gtrim::prune::mask::mask_pruner;
 
 /// Common initialization required by all commands.
 fn init(out_dir: &String, threads: usize) -> Result<()> {
@@ -38,11 +39,11 @@ fn init(out_dir: &String, threads: usize) -> Result<()> {
 }
 
 /// Prune columns based on gap threshold
-fn prune_gap(args: &PruneGapArgs) -> Result<()> {
+fn prune_gap(args: &cli::PruneGapArgs) -> Result<()> {
     init(&args.out_dir, args.threads)?;
 
     let mut pruner = gap_pruner::GapPruner::new(
-        args.file.clone(),
+        args.alignment_file.clone(),
         args.gap_threshold,
         args.max_residue_pruned,
         args.out_dir.clone(),
@@ -57,7 +58,7 @@ fn prune_gap(args: &PruneGapArgs) -> Result<()> {
 }
 
 /// Prune columns based on chi-square test.
-fn prune_chi2(args: &PruneChi2Args) -> Result<()> {
+fn prune_chi2(args: &cli::PruneChi2Args) -> Result<()> {
     init(&args.out_dir, args.threads_pruning)?;
 
     info!("Maximum residues to prune: {}", args.max_residue_pruned);
@@ -67,7 +68,7 @@ fn prune_chi2(args: &PruneChi2Args) -> Result<()> {
     info!("Pruning threads: {}", args.threads_pruning);
 
     let mut pruner = chi_square_pruner::ChiSquarePruner::new(
-        args.file.clone(),
+        args.alignment_file.clone(),
         args.max_residue_pruned,
         args.residues_to_prune_perc,
         args.permutations,
@@ -85,18 +86,39 @@ fn prune_chi2(args: &PruneChi2Args) -> Result<()> {
     Ok(())
 }
 
+/// Apply mask to multiple sequence alignment.
+fn mask(args: &cli::MaskArgs) -> Result<()> {
+    init(&args.out_dir, 1)?;
+
+    let mut pruner = mask_pruner::MaskPruner::new(
+        args.alignment_file.clone(),
+        args.mask_file.clone(),
+        args.out_dir.clone(),
+    );
+
+    if let Err(e) = pruner.run() {
+        error!("Error: {}", e);
+        std::process::exit(1);
+    }
+
+    Ok(())
+} 
+
 fn main() -> Result<()> {
     let start_time = Instant::now();
 
-    let cli = Cli::parse();
+    let cli = cli::Cli::parse();
 
     match &cli.command {
-        Commands::PruneGap(args) => {
+        cli::Commands::PruneGap(args) => {
             prune_gap(args)?;
         }
-        Commands::PruneChi2(args) => {
+        cli::Commands::PruneChi2(args) => {
             prune_chi2(args)?;
         } 
+        cli::Commands::Mask(args) => {
+            mask(args)?;
+        }
     }
     
     let elapsed = start_time.elapsed();

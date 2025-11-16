@@ -59,6 +59,25 @@ impl AlignmentReader {
     }
 }
 
+// Read binary mask (0 = false; 1 = true).
+pub fn read_mask(mask_file: &str) -> Result<Vec<bool>> {
+    let mask_string = std::fs::read_to_string(mask_file)
+        .with_context(|| format!("Failed to read mask file: {}", mask_file))?;
+
+    let mask_line = mask_string.lines().next().unwrap_or_default();
+
+    let mut mask = Vec::new();
+    for char_code in mask_line.chars() {
+        match char_code {
+            '0' => mask.push(false),
+            '1' => mask.push(true),
+            _ => anyhow::bail!("Invalid character '{}' found in mask file. Only '0' and '1' are allowed.", char_code),
+        }
+    }
+
+    Ok(mask)
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

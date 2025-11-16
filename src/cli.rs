@@ -25,16 +25,19 @@ pub enum Commands {
 
     /// Prune columns based on chi-square test.
     PruneChi2(PruneChi2Args),
+
+    /// Apply mask to multiple sequence alignment.
+    Mask(MaskArgs),
 }
 
 #[derive(Parser)]
 pub struct PruneGapArgs {
     /// File containing the multiple sequence alignment.
-    #[arg(long, value_parser = validate_input_file, required = true)]
-    pub file: String,
+    #[arg(short = 'i', long, value_parser = validate_input_file, required = true)]
+    pub alignment_file: String,
 
     /// Output directory.
-    #[arg(long, required = true)]
+    #[arg(short = 'o', long, required = true)]
     pub out_dir: String,
 
     /// Maximum percentage of gaps to retain column.
@@ -46,18 +49,18 @@ pub struct PruneGapArgs {
     pub max_residue_pruned: usize,
 
     /// Number of threads to use for pruning columns.
-    #[arg(long, default_value_t = DEFAULT_NUM_THREADS, value_parser = validate_threads)]
+    #[arg(short = 't', long, default_value_t = DEFAULT_NUM_THREADS, value_parser = validate_threads)]
     pub threads: usize,
 }
 
 #[derive(Parser)]
 pub struct PruneChi2Args {
     /// File containing the multiple sequence alignment.
-    #[arg(long, value_parser = validate_input_file, required = true)]
-    pub file: String,
+    #[arg(short = 'i', long, value_parser = validate_input_file, required = true)]
+    pub alignment_file: String,
 
     /// Output directory.
-    #[arg(long, required = true)]
+    #[arg(short = 'o', long, required = true)]
     pub out_dir: String,
 
     /// Maximum number of columns to prune.
@@ -92,8 +95,23 @@ pub struct PruneChi2Args {
     pub threads_permutations: usize,
 
     /// Number of threads to use for pruning columns.
-    #[arg(long, default_value_t = DEFAULT_NUM_THREADS, value_parser = validate_threads)]
+    #[arg(short = 't', long, default_value_t = DEFAULT_NUM_THREADS, value_parser = validate_threads)]
     pub threads_pruning: usize,
+}
+
+#[derive(Parser)]
+pub struct MaskArgs {
+    /// File containing the multiple sequence alignment.
+    #[arg(short = 'i', long, value_parser = validate_input_file, required = true)]
+    pub alignment_file: String,
+
+    /// File containing the binary mask.
+    #[arg(short = 'm', long, value_parser = validate_file, required = true)]
+    pub mask_file: String,
+
+    /// Output directory.
+    #[arg(short = 'o', long, required = true)]
+    pub out_dir: String,
 }
 
 fn validate_gap_threshold(value: &str) -> Result<f64, String> {
@@ -170,6 +188,18 @@ fn validate_input_file(file: &str) -> Result<String, String> {
         && path.extension().and_then(|s| s.to_str()) != Some("gz") {
         return Err("Input file must have .faa, .fna, .fasta, or .gz extension".to_string());
     }
+    Ok(file.to_string())
+}
+
+fn validate_file(file: &str) -> Result<String, String> {
+    let path = Path::new(file);
+    if !path.exists() {
+        return Err(format!("File '{}' does not exist", file));
+    }
+    if !path.is_file() {
+        return Err(format!("'{}' is not a file", file));
+    }
+
     Ok(file.to_string())
 }
 

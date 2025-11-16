@@ -12,7 +12,7 @@ fn test_prune_chi2() {
 
     let mut cmd = cargo_bin_cmd!("gtrim");
     cmd.arg("prune-chi2")
-        .arg("--file")
+        .arg("--alignment-file")
         .arg("./tests/input_file/gtdb_r226-n100.faa.gz")
         .arg("--residues-to-prune-perc")
         .arg("0")

@@ -5,6 +5,7 @@ use std::collections::HashMap;
 use anyhow::{Context, Result};
 use needletail::parse_fastx_file;
 
+#[allow(dead_code)]
 pub fn compare_tsv_files(generated_path: &Path, ground_truth_path: &Path, tolerance: f64, cols_to_compare: usize) {
     let generated_content = fs::read_to_string(generated_path)
         .unwrap_or_else(|err| panic!("Could not read generated file {:?}: {}", generated_path, err));
@@ -48,6 +49,7 @@ fn read_fasta_to_map(path: &Path) -> Result<HashMap<String, String>> {
     Ok(fasta_map)
 }
 
+#[allow(dead_code)]
 pub fn compare_fasta_files(generated_path: &Path, ground_truth_path: &Path)  {
     let generated_map = read_fasta_to_map(generated_path).unwrap_or_else(|err| panic!("Could not read FASTA file {:?}: {}", generated_path, err));
     let ground_truth_map = read_fasta_to_map(ground_truth_path).unwrap_or_else(|err| panic!("Could not read FASTA file {:?}: {}", generated_path, err));

@@ -11,7 +11,7 @@ use crate::alignment_reader::AlignmentReader;
 use crate::alignment_writer::{get_output_prefix, check_compressed_input, write_filtered_alignment, write_mask};
 
 pub struct GapPruner {
-    file: String,
+    alignment_file: String,
     gap_threshold: f64,
     max_residue_pruned: usize,
     out_dir: String,
@@ -25,13 +25,13 @@ struct PerColStats {
 
 impl GapPruner {
     pub fn new(
-        file: String,
+        alignment_file: String,
         gap_threshold: f64,
         max_residue_pruned: usize,
         out_dir: String,
     ) -> Self {
         Self {
-            file,
+            alignment_file,
             gap_threshold,
             max_residue_pruned,
             out_dir,
@@ -41,8 +41,8 @@ impl GapPruner {
     pub fn run(&mut self) -> Result<()> {
         info!("Starting gap pruning workflow.");
 
-        info!("Reading alignment from file: {}", self.file);
-        let reader = AlignmentReader::new(self.file.clone());
+        info!("Reading alignment from file: {}", self.alignment_file);
+        let reader = AlignmentReader::new(self.alignment_file.clone());
         let (seq_ids, alignment_array) = reader.run()?;
         info!("Alignment contains {} sequences and {} columns.", seq_ids.len(), alignment_array.ncols());
 
@@ -56,7 +56,7 @@ impl GapPruner {
         info!("Pruned {} columns.", mask.iter().filter(|&state| !state).count());
 
         // write results to output files
-        let output_prefix = get_output_prefix(&self.file, &self.out_dir)?;
+        let output_prefix = get_output_prefix(&self.alignment_file, &self.out_dir)?;
         let output_suffix = format!("_gt{}_m{}_pruned.fasta", self.gap_threshold, self.max_residue_pruned);
 
         let output_stats_file = output_suffix.replace(".fasta", ".tsv");
@@ -69,7 +69,7 @@ impl GapPruner {
 
         info!("Writing filtered alignment to file.");
         let output_alignment_file = format!("{}{}", output_prefix, output_suffix);
-        let compressed = check_compressed_input(&self.file);
+        let compressed = check_compressed_input(&self.alignment_file);
         write_filtered_alignment(&seq_ids, &alignment_array, &mask, &output_alignment_file, compressed)?;
 
         Ok(())

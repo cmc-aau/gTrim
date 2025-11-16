@@ -13,7 +13,7 @@ fn test_prune_gap() {
 
     let mut cmd = cargo_bin_cmd!("gtrim");
     cmd.arg("prune-gap")
-        .arg("--file")
+        .arg("--alignment-file")
         .arg("./tests/input_file/gap_test.fna.gz")
         .arg("--gap-threshold")
         .arg("50")
