@@ -3,11 +3,13 @@ use std::collections::{HashMap, HashSet};
 use anyhow::Result;
 use log::info;
 use ndarray::Array2;
-use indicatif::{ProgressBar, ProgressStyle};
+use indicatif::ProgressBar;
 use rayon::iter::{ParallelIterator, IntoParallelIterator};
 
 use crate::sequence_type_detector::SequenceTypeDetector;
 use crate::alignment_reader::AlignmentReader;
+use crate::alignment_writer::{get_output_prefix, check_compressed_input};
+use crate::progress::spinner;
 
 use super::chi_square_calculator::ChiSquareCalculator;
 use super::permutation_test::PermutationTest;
@@ -53,14 +55,6 @@ impl ChiSquarePruner {
         threads_permutations: usize,
         out_dir: String,
     ) -> Self {
-        let pb = ProgressBar::new_spinner();
-        pb.set_style(
-            ProgressStyle::default_spinner()
-                .template("{spinner:.green} [{elapsed_precise}] {msg}")
-                .unwrap()
-                .tick_chars("⣾⣷⣯⣟⡿⢿⣻⣽"),
-        );
-
         Self {
             file,
             max_residue_pruned,
@@ -73,7 +67,7 @@ impl ChiSquarePruner {
             threads_permutations,
             out_dir,
             alignment_size: 0,
-            progress: Some(pb),
+            progress: Some(spinner()),
         }
     }
 
@@ -82,11 +76,11 @@ impl ChiSquarePruner {
         
         info!("Reading alignment from file: {}", self.file);
         let reader = AlignmentReader::new(self.file.clone());
-        let (alignment, alignment_array) = reader.run()?;
+        let (seq_ids, alignment_array) = reader.run()?;
         let num_cols_orig = alignment_array.ncols();
-        info!("Alignment contains {} sequences and {} columns.", alignment.len(), num_cols_orig);
+        info!("Alignment contains {} sequences and {} columns.", seq_ids.len(), num_cols_orig);
 
-        let (is_dna, char_set) = SequenceTypeDetector::detect(&alignment)?;
+        let (is_dna, char_set) = SequenceTypeDetector::detect(&alignment_array)?;
         info!("Sequence type detected: {}", if is_dna { "DNA" } else { "amino acid" });
 
         // determine initial residues to prune per iteration
@@ -116,7 +110,8 @@ impl ChiSquarePruner {
         info!("Pruned {} columns.", prune_dict.len());
 
         // Write outputs
-        let suffix = if self.touchdown {
+        let output_prefix = get_output_prefix(&self.file, &self.out_dir)?;
+        let output_suffix = if self.touchdown {
             format!("_p{}_s{}_m{}_touchdown_pruned.fasta", self.permutations, self.initial_residues_to_prune, self.max_residue_pruned)
         } else if self.rapid_convergence {
             format!("_p{}_s{}_m{}_rapid_pruned.fasta", self.permutations, self.initial_residues_to_prune, self.max_residue_pruned)
@@ -124,34 +119,12 @@ impl ChiSquarePruner {
             format!("_p{}_s{}_m{}_pruned.fasta", self.permutations, self.initial_residues_to_prune, self.max_residue_pruned)
         };
 
-        // get the filename from the input path (error if missing or non-UTF8)
-        let mut filename = std::path::Path::new(&self.file)
-            .file_name()
-            .and_then(|name| name.to_str())
-            .ok_or_else(|| anyhow::anyhow!("Input path '{}' does not contain a valid filename", self.file))?;
-
-        // create owned stem and strip known extensions
-        filename = filename
-            .trim_end_matches(".gz")
-            .trim_end_matches(".faa")
-            .trim_end_matches(".fna")
-            .trim_end_matches(".fasta");
-
-        // join output directory with the sanitized stem and return as String
-        let base_path = std::path::Path::new(&self.out_dir)
-            .join(filename)
-            .to_string_lossy()
-            .into_owned();
-
-        let output_alignment_file = format!("{}{}", base_path, suffix);
-        write_alignment(&alignment, &pruned_alignment_array, &output_alignment_file)?;
-
-        let output_tsv_file = suffix.replace(".fasta", ".tsv");
-        let output_tsv_file = format!("{}{}", base_path, output_tsv_file);
+        let output_tsv_file = output_suffix.replace(".fasta", ".tsv");
+        let output_tsv_file = format!("{}{}", output_prefix, output_tsv_file);
         write_pruned_dict_to_tsv(&prune_dict, &output_tsv_file)?;
 
-        let output_mask_file = suffix.replace(".fasta", ".mask");
-        let output_mask_file = format!("{}{}", base_path, output_mask_file);
+        let output_mask_file = output_suffix.replace(".fasta", ".mask");
+        let output_mask_file = format!("{}{}", output_prefix, output_mask_file);
         write_mask(&prune_dict, num_cols_orig, &output_mask_file)?;
 
         // Calculate and write empirical p-values
@@ -164,19 +137,21 @@ impl ChiSquarePruner {
             &score_dict.after_real,
             &permutated_per_row_chi2,
             &empirical_pvalues,
-            &alignment,
+            &seq_ids,
         );
 
-        let output_score_tsv_file = suffix.replace(".fasta", "_scores.tsv");
-        let output_score_tsv_file = format!("{}{}", base_path, output_score_tsv_file);
+        let output_score_tsv_file = output_suffix.replace(".fasta", "_scores.tsv");
+        let output_score_tsv_file = format!("{}{}", output_prefix, output_score_tsv_file);
         write_score_dict_to_tsv(&row_empirical_pvalue_dict, &output_score_tsv_file)?;
 
-        let output_json_file = suffix.replace(".fasta", "_score_dict.json");
-        let output_json_file = format!("{}{}", base_path, output_json_file);
+        let output_json_file = output_suffix.replace(".fasta", "_score_dict.json");
+        let output_json_file = format!("{}{}", output_prefix, output_json_file);
         write_score_dict_to_json(&score_dict, &output_json_file)?;
 
-        info!("Taxa p-values and z-scores printed to {}", output_score_tsv_file);
-        info!("Chiscore values from permutation testing printed to {}", output_json_file);
+        info!("Writing filtered alignment to file.");
+        let output_alignment_file = format!("{}{}", output_prefix, output_suffix);
+        let compressed = check_compressed_input(&self.file);
+        write_alignment(&seq_ids, &pruned_alignment_array, &output_alignment_file, compressed)?;
 
         Ok(())
     }

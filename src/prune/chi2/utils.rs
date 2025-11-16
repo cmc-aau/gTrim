@@ -5,24 +5,17 @@ use std::collections::HashMap;
 use std::fs::File;
 use std::io::Write;
 
-use crate::alignment_reader::SeqRecord;
+use crate::alignment_writer::write_filtered_alignment;
 
 /// Write alignment to FASTA file
 pub fn write_alignment(
-    records: &[SeqRecord],
+    seq_ids: &[String],
     alignment_array: &Array2<char>,
     output_file: &str,
+    compress: bool,
 ) -> Result<()> {
-    let mut file = File::create(output_file)
-        .with_context(|| format!("Failed to create file: {}", output_file))?;
-
-    for (i, record) in records.iter().enumerate() {
-        writeln!(file, ">{}", record.id)?;
-        let seq: String = alignment_array.row(i).iter().collect();
-        writeln!(file, "{}", seq)?;
-    }
-
-    Ok(())
+    let mask = vec![true; alignment_array.ncols()];
+    write_filtered_alignment(seq_ids, alignment_array, &mask, output_file, compress)
 }
 
 /// Structure to hold pruning information for a column
@@ -160,9 +153,9 @@ pub fn make_score_dict(
     per_row_chi2: &[f64],
     permutated_per_row_chi2: &[f64],
     empirical_pvalues: &[f64],
-    alignment: &[SeqRecord],
+    seq_ids: &[String],
 ) -> HashMap<String, RowScoreInfo> {
-    let row_names: Vec<String> = alignment.iter().map(|r| r.id.clone()).collect();
+    let row_names: Vec<String> = seq_ids.to_vec();
     let mean_perm_chi2: f64 = permutated_per_row_chi2.iter().sum::<f64>() / permutated_per_row_chi2.len() as f64;
 
     let variance: f64 = permutated_per_row_chi2
@@ -196,18 +189,12 @@ mod tests {
         let per_row_chi2 = vec![10.0, 15.0];
         let permutated = vec![8.0, 9.0, 10.0, 11.0];
         let empirical_pvalues = vec![0.5, 0.25];
-        let alignment = vec![
-            SeqRecord {
-                id: "seq1".to_string(),
-                seq: vec!['A', 'C'],
-            },
-            SeqRecord {
-                id: "seq2".to_string(),
-                seq: vec!['G', 'T'],
-            },
+        let seq_ids = vec![
+            "seq1".to_string(),
+            "seq2".to_string(),
         ];
 
-        let score_dict = make_score_dict(&per_row_chi2, &permutated, &empirical_pvalues, &alignment);
+        let score_dict = make_score_dict(&per_row_chi2, &permutated, &empirical_pvalues, &seq_ids);
 
         assert_eq!(score_dict.len(), 2);
         assert!(score_dict.contains_key("seq1"));

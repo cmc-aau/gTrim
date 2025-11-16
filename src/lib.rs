@@ -1,4 +1,5 @@
 pub mod alignment_reader;
+pub mod alignment_writer;
 pub mod cli;
 pub mod logging;
 pub mod progress;
