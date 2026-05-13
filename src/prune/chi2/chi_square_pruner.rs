@@ -89,7 +89,7 @@ impl ChiSquarePruner {
             self.initial_residues_to_prune = 1;
         }
         self.residues_to_prune = self.initial_residues_to_prune;
-        info!("Initially columns to prune per iteration: {}", self.initial_residues_to_prune);
+        info!("Initial columns to prune per iteration: {}", self.initial_residues_to_prune);
 
         let permutation_test = PermutationTest::new(self.threads_permutations, self.permutations);
         let chi_square_calculator = ChiSquareCalculator::new(char_set);
@@ -186,10 +186,7 @@ impl ChiSquarePruner {
             .sum::<f64>()
             / permutated_per_row_chi2.len() as f64;
         let sd_perm_chi2 = variance.sqrt();
-
-        let mut residues_to_prune_indices: Vec<(usize, f64)> = Vec::with_capacity(self.residues_to_prune);
-        let mut initial_global_chi2 = 0.0;
-
+ 
         loop {
             if removed_columns_count >= self.max_residue_pruned {
                 break;
@@ -206,33 +203,6 @@ impl ChiSquarePruner {
 
             if iteration == 0 {
                 score_dict.before_real = stats.per_row_chi2.clone();
-            } else {
-                // Record pruned columns
-                for &(col, chi2_diff) in &residues_to_prune_indices {
-                    let pruned_col = original_indices[col];
-                    prune_dict.insert(
-                        pruned_col,
-                        PruneInfo {
-                            iteration,
-                            original_index: pruned_col,
-                            global_chi_score: stats.sum,
-                            initial_significant_chi_score: initial_global_chi2,
-                            chi_score_difference: chi2_diff,
-                            significant_taxa: significant_count,
-                        },
-                    );
-                    removed_columns_count += 1;
-                }
-
-                // Update original indices - remove pruned columns
-                let cols_to_remove: HashSet<usize> = residues_to_prune_indices.iter().map(|(c, _)| *c).collect();
-                let mut new_indices = Vec::with_capacity(original_indices.len() - cols_to_remove.len());
-                for (j, &idx) in original_indices.iter().enumerate() {
-                    if !cols_to_remove.contains(&j) {
-                        new_indices.push(idx);
-                    }
-                }
-                original_indices = new_indices;
             }
 
             let (should_stop, stop_reason) = self.check_stopping_criteria(
@@ -277,7 +247,7 @@ impl ChiSquarePruner {
                 chi_square_calculator,
             );
 
-            initial_global_chi2 = chi_square_calculator
+            let initial_global_chi2 = chi_square_calculator
                 .calculate_quartic_row_global_chi2(&stats.expected_observed, &stats.count_rows);
 
             // Sort columns by chi2 difference and get top N
@@ -290,14 +260,40 @@ impl ChiSquarePruner {
             });
 
             let num_to_remove = self.residues_to_prune.min(diff_vec.len());
-            residues_to_prune_indices = diff_vec[diff_vec.len() - num_to_remove..].to_vec();
+            let mut residues_to_prune_indices = diff_vec[diff_vec.len() - num_to_remove..].to_vec();
             residues_to_prune_indices.sort_by(|a, b| a.0.cmp(&b.0));
 
             // Remove all columns in a single pass
             let cols_to_remove: Vec<usize> = residues_to_prune_indices.iter().map(|(idx, _)| *idx).collect();
             alignment_array = remove_columns(&alignment_array, &cols_to_remove);
 
+            // Record pruned columns
             iteration += 1;
+            for &(col, chi2_diff) in &residues_to_prune_indices {
+                let pruned_col = original_indices[col];
+                prune_dict.insert(
+                    pruned_col,
+                    PruneInfo {
+                        iteration,
+                        original_index: pruned_col,
+                        global_chi_score: stats.sum,
+                        initial_significant_chi_score: initial_global_chi2,
+                        chi_score_difference: chi2_diff,
+                        significant_taxa: significant_count,
+                    },
+                );
+                removed_columns_count += 1;
+            }
+
+            // Update original indices - remove pruned columns
+            let cols_to_remove: HashSet<usize> = residues_to_prune_indices.iter().map(|(c, _)| *c).collect();
+            let mut new_indices = Vec::with_capacity(original_indices.len() - cols_to_remove.len());
+            for (j, &idx) in original_indices.iter().enumerate() {
+                if !cols_to_remove.contains(&j) {
+                    new_indices.push(idx);
+                }
+            }
+            original_indices = new_indices;
         }
 
         score_dict.after_real = self
