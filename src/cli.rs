@@ -28,90 +28,113 @@ pub enum Commands {
 
     /// Apply mask to multiple sequence alignment.
     Mask(MaskArgs),
+
+    /// Calculate column statistics.
+    ColumnStats(ColumnStatsArgs),
+    
 }
 
 #[derive(Parser)]
 pub struct PruneGapArgs {
     /// File containing the multiple sequence alignment.
-    #[arg(short = 'i', long, value_parser = validate_input_file, required = true)]
+    #[arg(short = 'i', long, help_heading = "Required", value_parser = validate_input_file, required = true)]
     pub alignment_file: String,
 
     /// Output directory.
-    #[arg(short = 'o', long, required = true)]
+    #[arg(short = 'o', long, help_heading = "Required", required = true)]
     pub out_dir: String,
 
     /// Maximum percentage of gaps to retain column.
-    #[arg(long, default_value_t = DEFAULT_GAP_THRESHOLD, value_parser = validate_gap_threshold)]
+    #[arg(long, help_heading = "Optional", default_value_t = DEFAULT_GAP_THRESHOLD, value_parser = validate_gap_threshold)]
     pub gap_threshold: f64,
 
     /// Maximum number of columns to prune.
-    #[arg(long, default_value_t = DEFAULT_MAX_RESIDUE_PRUNED, value_parser = validate_max_residue_pruned)]
+    #[arg(long, help_heading = "Optional", default_value_t = DEFAULT_MAX_RESIDUE_PRUNED, value_parser = validate_max_residue_pruned)]
     pub max_residue_pruned: usize,
 
     /// Number of threads to use for pruning columns.
-    #[arg(short = 't', long, default_value_t = DEFAULT_NUM_THREADS, value_parser = validate_threads)]
+    #[arg(short = 't', long, help_heading = "Optional", default_value_t = DEFAULT_NUM_THREADS, value_parser = validate_threads)]
     pub threads: usize,
 }
 
 #[derive(Parser)]
 pub struct PruneChi2Args {
     /// File containing the multiple sequence alignment.
-    #[arg(short = 'i', long, value_parser = validate_input_file, required = true)]
+    #[arg(short = 'i', long, help_heading = "Required", value_parser = validate_input_file, required = true)]
     pub alignment_file: String,
 
     /// Output directory.
-    #[arg(short = 'o', long, required = true)]
+    #[arg(short = 'o', long, help_heading = "Required", required = true)]
     pub out_dir: String,
 
     /// Maximum number of columns to prune.
-    #[arg(long, default_value_t = DEFAULT_MAX_RESIDUE_PRUNED, value_parser = validate_max_residue_pruned)]
+    #[arg(long, help_heading = "Optional", default_value_t = DEFAULT_MAX_RESIDUE_PRUNED, value_parser = validate_max_residue_pruned)]
     pub max_residue_pruned: usize,
 
     /// Percentage of top delta-chi2 columns to remove per iteration [0, 100]. Set to 0 to prune 1 column per iteration.
-    #[arg(long, default_value_t = DEFAULT_RESIDUES_TO_PRUNE_PERC, value_parser = validate_residues_to_prune_perc)]
+    #[arg(long, help_heading = "Optional", default_value_t = DEFAULT_RESIDUES_TO_PRUNE_PERC, value_parser = validate_residues_to_prune_perc)]
     pub residues_to_prune_perc: f64,
 
     /// Number of alignment permutations.
-    #[arg(long, default_value_t = DEFAULT_NUM_PERMUTATIONS, value_parser = validate_permutations)]
+    #[arg(long, help_heading = "Optional", default_value_t = DEFAULT_NUM_PERMUTATIONS, value_parser = validate_permutations)]
     pub permutations: usize,
 
     /// Prunes columns until no significant reduction in compositional bias is observed.
     /// Recommend setting residues_to_prune_perc to 1-2%. The number of columns to prune 
     /// will be reduced to 0.1% of the original alignment length per iteration after a 
     /// threshold of 99.0% is reached.
-    #[arg(long, conflicts_with = "rapid_convergence")]
+    #[arg(long, help_heading = "Optional", conflicts_with = "rapid_convergence")]
     pub touchdown: bool,
 
     /// Prunes columns until no significant reduction in compositional bias is observed.
     /// Recommend setting residues_to_prune_perc to 1-2%. The number of columns pruned
     /// is always residues_to_prune_perc multipled by the length of the remaining 
     /// alignment. This will generally converge faster than touchdown mode.
-    #[arg(long, conflicts_with = "touchdown")]
+    #[arg(long, help_heading = "Optional", conflicts_with = "touchdown")]
     pub rapid_convergence: bool,
 
     /// Number of threads to use when calculating permutations. Threads replicate the alignment in memory,
     /// which results in higher peak memory requirements.
-    #[arg(long, default_value_t = DEFAULT_NUM_THREADS, value_parser = validate_threads)]
+    #[arg(long, help_heading = "Optional", default_value_t = DEFAULT_NUM_THREADS, value_parser = validate_threads)]
     pub threads_permutations: usize,
 
     /// Number of threads to use for pruning columns.
-    #[arg(short = 't', long, default_value_t = DEFAULT_NUM_THREADS, value_parser = validate_threads)]
+    #[arg(short = 't', long, help_heading = "Optional", default_value_t = DEFAULT_NUM_THREADS, value_parser = validate_threads)]
     pub threads_pruning: usize,
 }
 
 #[derive(Parser)]
 pub struct MaskArgs {
     /// File containing the multiple sequence alignment.
-    #[arg(short = 'i', long, value_parser = validate_input_file, required = true)]
+    #[arg(short = 'i', long, help_heading = "Required", value_parser = validate_input_file, required = true)]
     pub alignment_file: String,
 
     /// File containing the binary mask.
-    #[arg(short = 'm', long, value_parser = validate_file, required = true)]
+    #[arg(short = 'm', long, help_heading = "Required", value_parser = validate_file, required = true)]
     pub mask_file: String,
 
     /// Output directory.
-    #[arg(short = 'o', long, required = true)]
+    #[arg(short = 'o', long, help_heading = "Required", required = true)]
     pub out_dir: String,
+
+    /// Number of threads to use for pruning columns.
+    #[arg(short = 't', long, help_heading = "Optional", default_value_t = DEFAULT_NUM_THREADS, value_parser = validate_threads)]
+    pub threads: usize,
+}
+
+#[derive(Parser)]
+pub struct ColumnStatsArgs {
+    /// File containing the multiple sequence alignment.
+    #[arg(short = 'i', long, help_heading = "Required", value_parser = validate_input_file, required = true)]
+    pub alignment_file: String,
+
+    /// Output directory.
+    #[arg(short = 'o', long, help_heading = "Required", required = true)]
+    pub out_dir: String,
+
+    /// Number of threads to use for pruning columns.
+    #[arg(short = 't', long, help_heading = "Optional", default_value_t = DEFAULT_NUM_THREADS, value_parser = validate_threads)]
+    pub threads: usize,
 }
 
 fn validate_gap_threshold(value: &str) -> Result<f64, String> {

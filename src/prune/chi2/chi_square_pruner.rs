@@ -18,6 +18,16 @@ use super::chi_square_writer::{
     write_score_dict_to_tsv, PruneInfo, ScoreDict,
 };
 
+struct PerRowStats {
+    count_rows: Array2<f64>,
+    expected_observed: Array2<f64>,
+    per_row_chi2: Vec<f64>,
+    median: f64,
+    mean: f64,
+    q95: f64,
+    sum: f64,
+}
+
 pub struct ChiSquarePruner {
     alignment_file: String,
     max_residue_pruned: usize,
@@ -31,16 +41,6 @@ pub struct ChiSquarePruner {
     out_dir: String,
     alignment_size: usize,
     progress: Option<ProgressBar>,
-}
-
-struct PerRowStats {
-    count_rows: Array2<f64>,
-    expected_observed: Array2<f64>,
-    per_row_chi2: Vec<f64>,
-    median: f64,
-    mean: f64,
-    q95: f64,
-    sum: f64,
 }
 
 impl ChiSquarePruner {

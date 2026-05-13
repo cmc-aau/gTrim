@@ -5,3 +5,4 @@ pub mod logging;
 pub mod progress;
 pub mod prune;
 pub mod sequence_type_detector;
+pub mod stats;

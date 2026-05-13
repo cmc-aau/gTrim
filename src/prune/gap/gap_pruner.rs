@@ -10,17 +10,16 @@ use crate::sequence_type_detector::{GAP_CHARS, SequenceTypeDetector};
 use crate::alignment_reader::AlignmentReader;
 use crate::alignment_writer::{get_output_prefix, check_compressed_input, write_filtered_alignment, write_mask};
 
+#[derive(Default, Clone)]
+struct PerColStats {
+    num_gaps: usize,
+    gap_perc: f64,
+}
 pub struct GapPruner {
     alignment_file: String,
     gap_threshold: f64,
     max_residue_pruned: usize,
     out_dir: String,
-}
-
-#[derive(Default, Clone)]
-struct PerColStats {
-    num_gaps: usize,
-    gap_perc: f64,
 }
 
 impl GapPruner {
@@ -51,7 +50,7 @@ impl GapPruner {
 
         // determine columns exceeding gap threshold that should be filtered
         info!("Pruning gappy columns.");
-        let col_stats = self.calculate_gap_statistics(&alignment_array);
+        let col_stats = self.calculate_gap_stats(&alignment_array);
         let mask = self.filter_gappy_columns(&col_stats, self.gap_threshold);
         info!("Pruned {} columns.", mask.iter().filter(|&state| !state).count());
 
@@ -76,7 +75,7 @@ impl GapPruner {
     }
 
     /// Determine gap statistics for each column in alignment.
-    fn calculate_gap_statistics(&self, alignment_array: &Array2<char>) -> Vec<PerColStats> {
+    fn calculate_gap_stats(&self, alignment_array: &Array2<char>) -> Vec<PerColStats> {
         let gaps: HashSet<char> = HashSet::from_iter(GAP_CHARS.iter().copied());
         let num_rows = alignment_array.nrows() as f64;
         let mut gap_stats = Vec::with_capacity(alignment_array.ncols());
@@ -134,7 +133,7 @@ mod tests {
             ['-', 'T', 'C', 'G'],
         ]);
         let pruner = create_pruner();
-        let stats = pruner.calculate_gap_statistics(&alignment_array);
+        let stats = pruner.calculate_gap_stats(&alignment_array);
 
         assert_eq!(stats.len(), 4);
 

@@ -11,6 +11,7 @@ use gtrim::cli;
 use gtrim::prune::gap::gap_pruner;
 use gtrim::prune::chi2::chi_square_pruner;
 use gtrim::prune::mask::mask_pruner;
+use gtrim::stats::column_stats;
 
 /// Common initialization required by all commands.
 fn init(out_dir: &String, threads: usize) -> Result<()> {
@@ -104,6 +105,23 @@ fn mask(args: &cli::MaskArgs) -> Result<()> {
     Ok(())
 } 
 
+/// Calculate column statistics.
+fn column_stats(args: &cli::ColumnStatsArgs) -> Result<()> {
+    init(&args.out_dir, 1)?;
+
+    let mut stats = column_stats::ColumnStats::new(
+        args.alignment_file.clone(),
+        args.out_dir.clone(),
+    );
+
+    if let Err(e) = stats.run() {
+        error!("Error: {}", e);
+        std::process::exit(1);
+    }
+
+    Ok(())
+}
+
 fn main() -> Result<()> {
     let start_time = Instant::now();
 
@@ -118,6 +136,9 @@ fn main() -> Result<()> {
         } 
         cli::Commands::Mask(args) => {
             mask(args)?;
+        }
+        cli::Commands::ColumnStats(args) => {
+            column_stats(args)?;
         }
     }
     
