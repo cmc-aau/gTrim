@@ -21,11 +21,7 @@ pub fn get_output_prefix(input_file: &str, out_dir: &str) -> Result<String> {
         .ok_or_else(|| anyhow::anyhow!("Input path '{}' does not contain a valid filename", input_file))?;
 
     // create owned stem and strip known extensions
-    filename = filename
-        .trim_end_matches(".gz")
-        .trim_end_matches(".faa")
-        .trim_end_matches(".fna")
-        .trim_end_matches(".fasta");
+    filename = strip_seq_extensions(filename);
 
     // join output directory with the sanitized stem and return as String
     let base_path = std::path::Path::new(out_dir)
@@ -36,15 +32,18 @@ pub fn get_output_prefix(input_file: &str, out_dir: &str) -> Result<String> {
     Ok(base_path)
 }
 
-/// Write filtered alignment to FASTA file.
-pub fn write_filtered_alignment(
-    seq_ids: &[String],
-    alignment_array: &Array2<char>,
-    mask: &[bool],
-    out_file: &str,
-    compress: bool,
-) -> Result<()> {
-    // Append .gz extension if compression is requested
+/// Strip known sequence file extensions (.gz, .faa, .fna, .fasta) from a filename.
+pub fn strip_seq_extensions(filename: &str) -> &str {
+    filename
+        .trim_end_matches(".gz")
+        .trim_end_matches(".faa")
+        .trim_end_matches(".fna")
+        .trim_end_matches(".fasta")
+}
+
+/// Create a buffered writer, optionally gzip compressed. Returns the writer and the
+/// final output path (with .gz appended if compression is requested).
+pub fn create_writer(out_file: &str, compress: bool) -> Result<(Box<dyn Write>, String)> {
     let out_path = if compress {
         format!("{}.gz", out_file)
     } else {
@@ -54,12 +53,25 @@ pub fn write_filtered_alignment(
     let file = File::create(&out_path)
         .with_context(|| format!("Failed to create file: {}", out_path))?;
 
-    let mut writer: Box<dyn Write> = if compress {
+    let writer: Box<dyn Write> = if compress {
         let num_threads = current_num_threads();
         Box::new(ZBuilder::<Gzip, _>::new().num_threads(num_threads).from_writer(file))
     } else {
         Box::new(BufWriter::new(file))
     };
+
+    Ok((writer, out_path))
+}
+
+/// Write filtered alignment to FASTA file.
+pub fn write_filtered_alignment(
+    seq_ids: &[String],
+    alignment_array: &Array2<char>,
+    mask: &[bool],
+    out_file: &str,
+    compress: bool,
+) -> Result<()> {
+    let (mut writer, _) = create_writer(out_file, compress)?;
 
     for (row_idx, id) in seq_ids.iter().enumerate() {
         writeln!(writer, ">{}", id)?;

@@ -1,0 +1,4 @@
+locus	genome_id	num_comparisons	num_outliers	num_upper_comparisons	num_upper_outliers	masked_by	best_match_id	best_match_identity	best_match_aai	source_coherent	match_taxon	shared_taxon
+333279at4751	GCA_047655925.1	3	3	3	2	both	GCA_958449795.1	100.0000	52.9837	true	g__Genus2	p__Phylum1
+3487871at4751	GCA_036780745.1	3	2	3	0	low_identity	GCA_000587855.1	35.7616	38.8336	NA	NA	NA
+96853at4751	GCA_036780745.1	3	3	3	0	low_identity	GCA_000182565.2	37.0000	34.5114	NA	NA	NA
