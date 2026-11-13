@@ -54,6 +54,7 @@ Options:
 - `-i/--alignment-file`: file containing the concatenated marker gene alignment.
 - `-m/--marker-info-file`: tab-separated file listing the markers in the order they are concatenated, with the columns `Marker Id`, `Description` and `Length (bp)` (e.g. `gtdb_r<release>_bac120_markers_info.tsv`). The marker lengths must sum to the alignment length.
 - `-o/--out-dir`: output directory.
+- `--mask-file`: columns removed from the full alignment before trimming (e.g. by [WitChi](https://github.com/stephkoest/witchi)), as a WitChi pruned TSV or binary mask. See the [documentation](https://cmc-aau.github.io/gTrim/) for the formats.
 - `--min-perc-aa`: minimum percentage of sequences with a residue (not a gap) required to retain a column (default: 50).
 - `--min-consensus`: minimum percentage of residues that must be the most common residue to retain a column, inclusive (default: 25).
 - `--max-consensus`: maximum percentage of residues that can be the most common residue to retain a column, exclusive (default: 95).
@@ -66,7 +67,7 @@ Gaps are `-`, `.`, `_` and `*`. Outputs, with the prefix `<input>.trimmed`:
 - `.fasta`: the trimmed alignment.
 - `.mask`: columns in the trimmed alignment.
 - `.filtered.mask`: columns that passed the filters, before subsampling.
-- `.markers.tsv`: per-marker counts of retained, sampled, gappy, conserved and unconserved columns.
+- `.markers.tsv`: per-marker counts of masked (removed by `--mask-file`), retained, sampled, gappy, conserved and unconserved columns.
 - `.genomes.tsv`: number and percentage of residues in each sequence of the trimmed alignment.
 
 Apply a mask to an alignment:

@@ -9,6 +9,26 @@ for inferring a phylogeny, and can then subsample the same number of columns fro
 the concatenated marker gene alignments of the Genome Taxonomy Database (GTDB).
 
 
+Columns removed before trimming
+-------------------------------
+
+The marker info file gives the length of each marker in the full concatenated alignment. If columns were removed from
+this alignment before trimming, for example by `WitChi <https://github.com/stephkoest/witchi>`_, the markers no
+longer start where the marker info file says they do. ``--mask-file`` gives the columns that were removed, either as a
+:ref:`WitChi pruned TSV <files/witchi.tsv>` or as a :ref:`binary mask <files/mask>`. Each marker is then reduced by the
+number of its columns that were removed, and the columns of the input alignment are assigned to markers in order.
+
+``trim`` checks that the inputs line up before doing any filtering:
+
+* Without ``--mask-file``, the marker lengths must sum to the length of the alignment.
+* With ``--mask-file``, a binary mask must have one character for each column described by the marker info file, the
+  indices in a WitChi file must be less than the summed marker length and be listed only once, and the number of
+  columns retained by the mask must equal the length of the alignment.
+
+The output masks are over the full alignment: columns removed by ``--mask-file`` are ``0``, and the
+``masked_columns`` column of :ref:`files/trimmed.markers.tsv` gives the number removed from each marker.
+
+
 1. Filtering columns
 --------------------
 
@@ -55,7 +75,12 @@ marker. It differs in the following ways:
 * If ``--msa-length`` cannot be reached, every retained column is used. ``msa_filter`` samples at most 999 columns
   from each marker.
 * A run in which no columns pass the filters is reported as an error.
-* The optional WitChi input of ``msa_filter`` is not supported.
+* ``--mask-file`` accepts a binary mask as well as a WitChi pruned TSV.
+* ``msa_filter`` assigns a removed column that is the first column of a marker (other than the first marker) to the
+  preceding marker, so the boundary between the two markers is shifted by one column in the input alignment. ``trim``
+  assigns each removed column to the marker it belongs to. When a removed column is the first column of a marker,
+  the filtered columns are the same, but the per-marker statistics and the number of columns sampled from the
+  affected markers can differ from ``msa_filter``.
 
 The ``--min-perc-aa`` option filters columns, not genomes, despite the wording of the ``msa_filter`` help text.
 
@@ -69,5 +94,12 @@ release 226, with ``--msa-length 5000`` and with
 the number of retained and sampled columns of every marker were identical. ``trim`` took 2 seconds compared to 26
 seconds for ``msa_filter``.
 
-The integration tests of gTrim include a ``trim`` test on the first 200 genomes and first 10 bac120 markers of this
-alignment, whose expected output was checked against ``msa_filter``.
+With ``--mask-file``, ``trim`` was compared to ``msa_filter`` given a WitChi pruned TSV removing 2,500 random
+columns from this alignment, none of which was the first column of a marker, with ``--msa-length 5000``: the filtered
+masks, per-marker statistics and number of columns sampled from each marker were identical, and a binary mask of the
+same columns gave identical output. With a second WitChi file removing 2,504 columns, 9 of which were the first column of a
+marker, the filtered masks were still identical but the statistics of the affected markers differed, as described
+above.
+
+The integration tests of gTrim include ``trim`` tests on the first 200 genomes and first 10 bac120 markers of this
+alignment, with and without a mask file, whose expected output was checked against ``msa_filter``.
