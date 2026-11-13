@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.4.0
+
+### Added
+
+- `trim` subcommand: a reimplementation of `msa_filter` from GenomeTreeTk, without its optional WitChi input. It takes a concatenated marker gene alignment and a marker info file, removes gappy (`--min-perc-aa`), highly conserved (`--max-consensus`) and poorly conserved (`--min-consensus`) columns, and randomly subsamples the same number of columns from each marker to reach about `--msa-length` columns. Outputs the trimmed alignment, masks before and after subsampling, per-marker statistics and per-genome residue counts.
+  - Filtered columns and the number of columns sampled per marker are identical to `msa_filter`. Sampling is seeded (`--seed`), so results are reproducible.
+  - When `--msa-length` cannot be reached, every retained column is used, rather than at most 999 per marker.
+- `rand` and `rand_chacha` dependencies.
+
 ## 0.3.0
 
 ### Removed
