@@ -1,0 +1,196 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>How trim works &mdash; gTrim 0.7.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../_static/theme_overrides.css?v=825081b2" />
+
+  
+    <link rel="shortcut icon" href="../_static/gtrim_favicon.png"/>
+    <link rel="canonical" href="https://cmc-aau.github.io/gTrim/about/how_trim_works.html" />
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=5a057da9"></script>
+      <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+      <script src="../_static/custom.js?v=d63a34f1"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Changelog" href="../changelog.html" />
+    <link rel="prev" title="gtrim.log" href="../files/gtrim.log.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html">
+            
+              <img src="../_static/gtrim_stacked.svg" class="logo" alt="Logo"/>
+          </a>
+<div class="version" style="text-align: center; margin-top: 10px; margin-bottom: 10px; font-weight: bold;">
+  v0.7.1
+</div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Getting started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../index.html">Home</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../installing.html">Installing gTrim</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../faq.html">FAQ</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Running gTrim</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../commands/index.html">Commands</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../files/index.html">Files</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">About</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">How trim works</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#filtering-columns">1. Filtering columns</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#subsampling-columns">2. Subsampling columns</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#differences-from-msa-filter">Differences from msa_filter</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#validation">Validation</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../changelog.html">Changelog</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../references.html">References</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">gTrim</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content style-external-links">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">How trim works</li>
+      <li class="wy-breadcrumbs-aside">
+              <a href="https://github.com/cmc-aau/gTrim/blob/main/docs/src/about/how_trim_works.rst" class="fa fa-github"> Edit on GitHub</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="how-trim-works">
+<span id="about-how-trim-works"></span><h1>How trim works<a class="headerlink" href="#how-trim-works" title="Link to this heading"></a></h1>
+<p><a class="reference internal" href="../commands/trim.html#commands-trim"><span class="std std-ref">trim</span></a> removes columns from a concatenated marker gene alignment that are unlikely to be informative
+for inferring a phylogeny, and can then subsample the same number of columns from each marker. It reimplements the
+<code class="docutils literal notranslate"><span class="pre">msa_filter</span></code> command of <a class="reference external" href="https://github.com/dparks1134/GenomeTreeTk">GenomeTreeTk</a>, which has been used to trim
+the concatenated marker gene alignments of the Genome Taxonomy Database (GTDB).</p>
+<section id="filtering-columns">
+<h2>1. Filtering columns<a class="headerlink" href="#filtering-columns" title="Link to this heading"></a></h2>
+<p>Each column of the alignment is classified as follows, using the <code class="docutils literal notranslate"><span class="pre">-</span></code>, <code class="docutils literal notranslate"><span class="pre">.</span></code>, <code class="docutils literal notranslate"><span class="pre">_</span></code> and <code class="docutils literal notranslate"><span class="pre">*</span></code> characters as gaps:</p>
+<ul class="simple">
+<li><p><strong>Gappy:</strong> more than (100 − <code class="docutils literal notranslate"><span class="pre">--min-perc-aa</span></code>)% of sequences have a gap in the column, or every sequence does.
+With the default of 50, a column is gappy if more than half of the sequences have a gap.</p></li>
+<li><p>Otherwise, the <strong>consensus</strong> of the column is the number of sequences with the most common residue divided by the
+number of sequences without a gap. A column is:</p>
+<ul>
+<li><p><strong>unconserved</strong> if its consensus is below <code class="docutils literal notranslate"><span class="pre">--min-consensus</span></code> (default: 25%);</p></li>
+<li><p><strong>conserved</strong> if its consensus is at or above <code class="docutils literal notranslate"><span class="pre">--max-consensus</span></code> (default: 95%);</p></li>
+<li><p><strong>retained</strong> otherwise.</p></li>
+</ul>
+</li>
+</ul>
+<p>Only retained columns pass the filters. They are written to <code class="docutils literal notranslate"><span class="pre">[prefix].trimmed.filtered.mask</span></code>, and the number of
+columns in each class is reported for each marker in <a class="reference internal" href="../files/trimmed.markers.tsv.html#files-trimmed-markers-tsv"><span class="std std-ref">trimmed.markers.tsv</span></a>.</p>
+</section>
+<section id="subsampling-columns">
+<h2>2. Subsampling columns<a class="headerlink" href="#subsampling-columns" title="Link to this heading"></a></h2>
+<p>To give each marker a similar influence on the phylogeny, the same number of columns, <em>k</em>, is randomly sampled from
+the retained columns of each marker. <em>k</em> is the smallest number for which the sum over all markers of
+min(retained columns, <em>k</em>) is at least <code class="docutils literal notranslate"><span class="pre">--msa-length</span></code>. Markers with fewer than <em>k</em> retained columns contribute all
+of their retained columns. If fewer than <code class="docutils literal notranslate"><span class="pre">--msa-length</span></code> columns are retained, every retained column is kept and no
+subsampling is done; this is the case by default, as <code class="docutils literal notranslate"><span class="pre">--msa-length</span></code> is 1,000,000.</p>
+<p>Columns are sampled with a ChaCha8 random number generator seeded with <code class="docutils literal notranslate"><span class="pre">--seed</span></code> (default: 42), using a single
+generator for the markers in the order they are listed in the marker info file. The sampled columns therefore depend
+only on the seed and the input, not on the number of threads. The sampled columns are written to
+<code class="docutils literal notranslate"><span class="pre">[prefix].trimmed.mask</span></code> and form the trimmed alignment.</p>
+</section>
+<section id="differences-from-msa-filter">
+<h2>Differences from msa_filter<a class="headerlink" href="#differences-from-msa-filter" title="Link to this heading"></a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">trim</span></code> produces the same filtered columns as <code class="docutils literal notranslate"><span class="pre">msa_filter</span></code> and samples the same number of columns from each
+marker. It differs in the following ways:</p>
+<ul class="simple">
+<li><p>Sampling is seeded, so results are reproducible. <code class="docutils literal notranslate"><span class="pre">msa_filter</span></code> is not seeded, so the specific columns sampled
+from each marker differ between the two programs and between runs of <code class="docutils literal notranslate"><span class="pre">msa_filter</span></code>.</p></li>
+<li><p>The default <code class="docutils literal notranslate"><span class="pre">--msa-length</span></code> is 1,000,000, so by default no columns are subsampled. The default of <code class="docutils literal notranslate"><span class="pre">msa_filter</span></code>
+is 5,000.</p></li>
+<li><p>If <code class="docutils literal notranslate"><span class="pre">--msa-length</span></code> cannot be reached, every retained column is used. <code class="docutils literal notranslate"><span class="pre">msa_filter</span></code> samples at most 999 columns
+from each marker.</p></li>
+<li><p>A run in which no columns pass the filters is reported as an error.</p></li>
+<li><p>The optional WitChi input of <code class="docutils literal notranslate"><span class="pre">msa_filter</span></code> is not supported.</p></li>
+</ul>
+<p>The <code class="docutils literal notranslate"><span class="pre">--min-perc-aa</span></code> option filters columns, not genomes, despite the wording of the <code class="docutils literal notranslate"><span class="pre">msa_filter</span></code> help text.</p>
+</section>
+<section id="validation">
+<h2>Validation<a class="headerlink" href="#validation" title="Link to this heading"></a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">trim</span></code> was compared to <code class="docutils literal notranslate"><span class="pre">msa_filter</span></code> on an alignment of 5,000 GTDB genomes using the bac120 markers of GTDB
+release 226, with <code class="docutils literal notranslate"><span class="pre">--msa-length</span> <span class="pre">5000</span></code> and with
+<code class="docutils literal notranslate"><span class="pre">--msa-length</span> <span class="pre">12000</span> <span class="pre">--min-perc-aa</span> <span class="pre">70</span> <span class="pre">--min-consensus</span> <span class="pre">10</span> <span class="pre">--max-consensus</span> <span class="pre">90</span></code>. In both cases, the filtered masks and
+the number of retained and sampled columns of every marker were identical. <code class="docutils literal notranslate"><span class="pre">trim</span></code> took 2 seconds compared to 26
+seconds for <code class="docutils literal notranslate"><span class="pre">msa_filter</span></code>.</p>
+<p>The integration tests of gTrim include a <code class="docutils literal notranslate"><span class="pre">trim</span></code> test on the first 200 genomes and first 10 bac120 markers of this
+alignment, whose expected output was checked against <code class="docutils literal notranslate"><span class="pre">msa_filter</span></code>.</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../files/gtrim.log.html" class="btn btn-neutral float-left" title="gtrim.log" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../changelog.html" class="btn btn-neutral float-right" title="Changelog" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2026, Donovan Parks.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

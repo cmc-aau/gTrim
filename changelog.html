@@ -1,0 +1,300 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Changelog &mdash; gTrim 0.7.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=03e43079" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="_static/theme_overrides.css?v=825081b2" />
+
+  
+    <link rel="shortcut icon" href="_static/gtrim_favicon.png"/>
+    <link rel="canonical" href="https://cmc-aau.github.io/gTrim/changelog.html" />
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=5a057da9"></script>
+      <script src="_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
+      <script src="_static/custom.js?v=d63a34f1"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="References" href="references.html" />
+    <link rel="prev" title="How trim works" href="about/how_trim_works.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html">
+            
+              <img src="_static/gtrim_stacked.svg" class="logo" alt="Logo"/>
+          </a>
+<div class="version" style="text-align: center; margin-top: 10px; margin-bottom: 10px; font-weight: bold;">
+  v0.7.1
+</div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Getting started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="index.html">Home</a></li>
+<li class="toctree-l1"><a class="reference internal" href="installing.html">Installing gTrim</a></li>
+<li class="toctree-l1"><a class="reference internal" href="faq.html">FAQ</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Running gTrim</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="commands/index.html">Commands</a></li>
+<li class="toctree-l1"><a class="reference internal" href="files/index.html">Files</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">About</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="about/how_trim_works.html">How trim works</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Changelog</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#id2">0.7.1</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#added">Added</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#changed">Changed</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#id3">0.7.0</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#id4">Changed</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#id5">0.6.0</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#id6">Changed</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#id7">0.5.0</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#id8">Changed</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#id9">0.4.0</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#id10">Added</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#id11">0.3.0</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#removed">Removed</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id12">Changed</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#id13">0.2.0</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#id14">Added</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#fixed">Fixed</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="references.html">References</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">gTrim</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content style-external-links">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Changelog</li>
+      <li class="wy-breadcrumbs-aside">
+              <a href="https://github.com/cmc-aau/gTrim/blob/main/docs/src/changelog.rst" class="fa fa-github"> Edit on GitHub</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="changelog">
+<span id="id1"></span><h1>Changelog<a class="headerlink" href="#changelog" title="Link to this heading"></a></h1>
+<section id="id2">
+<h2>0.7.1<a class="headerlink" href="#id2" title="Link to this heading"></a></h2>
+<section id="added">
+<h3>Added<a class="headerlink" href="#added" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>Sphinx documentation in <code class="docutils literal notranslate"><span class="pre">docs/</span></code>, in the style of the gTranslate documentation, covering installation, each command and its options, the input and output files, how <code class="docutils literal notranslate"><span class="pre">trim</span></code> works and how it differs from GenomeTreeTk <code class="docutils literal notranslate"><span class="pre">msa_filter</span></code>, an FAQ, references, and this changelog. The version shown is read from <code class="docutils literal notranslate"><span class="pre">Cargo.toml</span></code>. Build it with <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">html</span></code> in <code class="docutils literal notranslate"><span class="pre">docs/</span></code> (requirements in <code class="docutils literal notranslate"><span class="pre">docs/requirements.txt</span></code>).</p></li>
+<li><p>gTrim logo in the style of the gTranslate logo: nine alignment rows whose columns share one colour per nucleotide, with red bars marking the filtered columns, and a “gTrim” wordmark. The files (mark, icon, horizontal and stacked lockups, wordmark and favicon) are in <code class="docutils literal notranslate"><span class="pre">docs/src/_static/</span></code>; the stacked lockup and favicon are used by the documentation and the mark heads the README.</p></li>
+<li><p>GitHub Actions workflow (<code class="docutils literal notranslate"><span class="pre">.github/workflows/docs.yml</span></code>) that builds the documentation on every push to <code class="docutils literal notranslate"><span class="pre">main</span></code> and publishes it to the <code class="docutils literal notranslate"><span class="pre">gh_pages</span></code> branch for GitHub Pages at https://cmc-aau.github.io/gTrim/.</p></li>
+</ul>
+</section>
+<section id="changed">
+<h3>Changed<a class="headerlink" href="#changed" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>The README states more prominently that gTrim is a work in progress and links to the documentation.</p></li>
+</ul>
+</section>
+</section>
+<section id="id3">
+<h2>0.7.0<a class="headerlink" href="#id3" title="Link to this heading"></a></h2>
+<section id="id4">
+<h3>Changed<a class="headerlink" href="#id4" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>Output file names no longer encode parameter values. Each command adds a word for the command to the input name (with <code class="docutils literal notranslate"><span class="pre">.gz</span></code>, <code class="docutils literal notranslate"><span class="pre">.faa</span></code>, <code class="docutils literal notranslate"><span class="pre">.fna</span></code> or <code class="docutils literal notranslate"><span class="pre">.fasta</span></code> removed): <code class="docutils literal notranslate"><span class="pre">.pruned</span></code> (<code class="docutils literal notranslate"><span class="pre">prune-gap</span></code>), <code class="docutils literal notranslate"><span class="pre">.trimmed</span></code> (<code class="docutils literal notranslate"><span class="pre">trim</span></code>), <code class="docutils literal notranslate"><span class="pre">.masked</span></code> (<code class="docutils literal notranslate"><span class="pre">mask</span></code>) and <code class="docutils literal notranslate"><span class="pre">.column_stats</span></code> (<code class="docutils literal notranslate"><span class="pre">column-stats</span></code>). For example, <code class="docutils literal notranslate"><span class="pre">trim</span></code> on <code class="docutils literal notranslate"><span class="pre">gtdb_r237_bac120_concatenated.masked.faa.gz</span></code> now writes <code class="docutils literal notranslate"><span class="pre">gtdb_r237_bac120_concatenated.masked.trimmed.fasta.gz</span></code> instead of <code class="docutils literal notranslate"><span class="pre">gtdb_r237_bac120_concatenated.masked_l5000_aa50_c25-95_trimmed.fasta.gz</span></code>. Companion files use <code class="docutils literal notranslate"><span class="pre">.</span></code> instead of <code class="docutils literal notranslate"><span class="pre">_</span></code>: <code class="docutils literal notranslate"><span class="pre">.trimmed.filtered.mask</span></code>, <code class="docutils literal notranslate"><span class="pre">.trimmed.markers.tsv</span></code>, <code class="docutils literal notranslate"><span class="pre">.trimmed.genomes.tsv</span></code>, <code class="docutils literal notranslate"><span class="pre">.pruned.tsv</span></code>, <code class="docutils literal notranslate"><span class="pre">.pruned.mask</span></code>.</p></li>
+<li><p>Test ground-truth files renamed to match; their contents are unchanged.</p></li>
+</ul>
+</section>
+</section>
+<section id="id5">
+<h2>0.6.0<a class="headerlink" href="#id5" title="Link to this heading"></a></h2>
+<section id="id6">
+<h3>Changed<a class="headerlink" href="#id6" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>Subcommands are listed in the order <code class="docutils literal notranslate"><span class="pre">prune-gap</span></code>, <code class="docutils literal notranslate"><span class="pre">trim</span></code>, <code class="docutils literal notranslate"><span class="pre">mask</span></code>, <code class="docutils literal notranslate"><span class="pre">column-stats</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">trim</span></code>: the default <code class="docutils literal notranslate"><span class="pre">--msa-length</span></code> is now 1000000, so by default every column passing the filters is retained and no subsampling is done (unless more than 1,000,000 columns pass). Pass <code class="docutils literal notranslate"><span class="pre">--msa-length</span> <span class="pre">5000</span></code> for the previous behaviour, which matches GenomeTreeTk <code class="docutils literal notranslate"><span class="pre">msa_filter</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">trim</span></code>: the default <code class="docutils literal notranslate"><span class="pre">--seed</span></code> is now 42 (was 12345). The <code class="docutils literal notranslate"><span class="pre">trim</span></code> test ground truth was regenerated; the filtered columns are unchanged.</p></li>
+</ul>
+</section>
+</section>
+<section id="id7">
+<h2>0.5.0<a class="headerlink" href="#id7" title="Link to this heading"></a></h2>
+<section id="id8">
+<h3>Changed<a class="headerlink" href="#id8" title="Link to this heading"></a></h3>
+<ul>
+<li><p>Alignments are stored as <code class="docutils literal notranslate"><span class="pre">Array2&lt;u8&gt;</span></code> (one byte per residue) instead of <code class="docutils literal notranslate"><span class="pre">Array2&lt;char&gt;</span></code>. The reader appends each sequence to a single buffer that becomes the array’s storage, rather than collecting a <code class="docutils literal notranslate"><span class="pre">Vec&lt;Vec&lt;char&gt;&gt;</span></code> and copying it into the array, which kept two 4-byte copies of every residue in memory at once. Peak memory drops by about 8× for every command. On <code class="docutils literal notranslate"><span class="pre">test_sets/gtdb_n10000_test</span></code> (10,000 × 41,084, 16 threads), measured with <code class="docutils literal notranslate"><span class="pre">/usr/bin/time</span> <span class="pre">-v</span></code>:</p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Command</p></th>
+<th class="head"><p>Peak RSS before → after</p></th>
+<th class="head"><p>Wall time before → after</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">trim</span></code></p></td>
+<td><p>3.25 GB → 0.42 GB</p></td>
+<td><p>4.1 s → 2.1 s</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">prune-gap</span> <span class="pre">--gap-threshold</span> <span class="pre">50</span></code></p></td>
+<td><p>3.25 GB → 0.43 GB</p></td>
+<td><p>14.9 s → 3.1 s</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">mask</span></code></p></td>
+<td><p>3.25 GB → 0.41 GB</p></td>
+<td><p>5.1 s → 2.8 s</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">column-stats</span></code></p></td>
+<td><p>3.25 GB → 0.43 GB</p></td>
+<td><p>19.4 s → 3.0 s</p></td>
+</tr>
+</tbody>
+</table>
+<p>The output files of <code class="docutils literal notranslate"><span class="pre">trim</span></code>, <code class="docutils literal notranslate"><span class="pre">prune-gap</span></code> and <code class="docutils literal notranslate"><span class="pre">mask</span></code> are byte-identical to 0.4.0.</p>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">prune-gap</span></code> and <code class="docutils literal notranslate"><span class="pre">column-stats</span></code> count residues over blocks of adjacent columns in parallel (new <code class="docutils literal notranslate"><span class="pre">column_counts</span></code> module, shared with <code class="docutils literal notranslate"><span class="pre">trim</span></code>) instead of walking the alignment one column at a time.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">column-stats</span></code> lists residues with equal counts in character order. Previously their order depended on hash map iteration and could change between runs. Its TSV is now written through a buffered writer.</p></li>
+<li><p>Non-ASCII bytes in an alignment are written back out unchanged. Previously each was treated as a Latin-1 character and written as UTF-8.</p></li>
+</ul>
+</section>
+</section>
+<section id="id9">
+<h2>0.4.0<a class="headerlink" href="#id9" title="Link to this heading"></a></h2>
+<section id="id10">
+<h3>Added<a class="headerlink" href="#id10" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">trim</span></code> subcommand: a reimplementation of <code class="docutils literal notranslate"><span class="pre">msa_filter</span></code> from GenomeTreeTk, without its optional WitChi input. It takes a concatenated marker gene alignment and a marker info file, removes gappy (<code class="docutils literal notranslate"><span class="pre">--min-perc-aa</span></code>), highly conserved (<code class="docutils literal notranslate"><span class="pre">--max-consensus</span></code>) and poorly conserved (<code class="docutils literal notranslate"><span class="pre">--min-consensus</span></code>) columns, and randomly subsamples the same number of columns from each marker to reach about <code class="docutils literal notranslate"><span class="pre">--msa-length</span></code> columns. Outputs the trimmed alignment, masks before and after subsampling, per-marker statistics and per-genome residue counts.</p>
+<ul>
+<li><p>Filtered columns and the number of columns sampled per marker are identical to <code class="docutils literal notranslate"><span class="pre">msa_filter</span></code>. Sampling is seeded (<code class="docutils literal notranslate"><span class="pre">--seed</span></code>), so results are reproducible.</p></li>
+<li><p>When <code class="docutils literal notranslate"><span class="pre">--msa-length</span></code> cannot be reached, every retained column is used, rather than at most 999 per marker.</p></li>
+</ul>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">rand</span></code> and <code class="docutils literal notranslate"><span class="pre">rand_chacha</span></code> dependencies.</p></li>
+</ul>
+</section>
+</section>
+<section id="id11">
+<h2>0.3.0<a class="headerlink" href="#id11" title="Link to this heading"></a></h2>
+<section id="removed">
+<h3>Removed<a class="headerlink" href="#removed" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">prune-chi2</span></code> subcommand and its module (<code class="docutils literal notranslate"><span class="pre">src/prune/chi2/</span></code>), integration test and test data.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">mask-divergent-loci</span></code> subcommand and its module (<code class="docutils literal notranslate"><span class="pre">src/prune/divergent/</span></code>), integration test, test data and test-set script, <code class="docutils literal notranslate"><span class="pre">examples/aai_matrix.rs</span></code>, the example plots in <code class="docutils literal notranslate"><span class="pre">example_files/</span></code>, the methodology document <code class="docutils literal notranslate"><span class="pre">MASK_DIVERGENT_LOCI.md</span></code> and the evaluation scripts in <code class="docutils literal notranslate"><span class="pre">analysis/mask_divergent_loci/</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">src/progress.rs</span></code> and the dependencies used only by the removed commands: <code class="docutils literal notranslate"><span class="pre">csv</span></code>, <code class="docutils literal notranslate"><span class="pre">indicatif</span></code>, <code class="docutils literal notranslate"><span class="pre">rand</span></code>, <code class="docutils literal notranslate"><span class="pre">rand_chacha</span></code>, <code class="docutils literal notranslate"><span class="pre">resvg</span></code>, <code class="docutils literal notranslate"><span class="pre">serde</span></code>, <code class="docutils literal notranslate"><span class="pre">serde_json</span></code> and <code class="docutils literal notranslate"><span class="pre">flate2</span></code> (dev).</p></li>
+</ul>
+</section>
+<section id="id12">
+<h3>Changed<a class="headerlink" href="#id12" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">README.md</span></code> and <code class="docutils literal notranslate"><span class="pre">CLAUDE.md</span></code> describe the remaining commands (<code class="docutils literal notranslate"><span class="pre">prune-gap</span></code>, <code class="docutils literal notranslate"><span class="pre">mask</span></code>, <code class="docutils literal notranslate"><span class="pre">column-stats</span></code>).</p></li>
+</ul>
+</section>
+</section>
+<section id="id13">
+<h2>0.2.0<a class="headerlink" href="#id13" title="Link to this heading"></a></h2>
+<section id="id14">
+<h3>Added<a class="headerlink" href="#id14" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">mask-divergent-loci</span></code> subcommand. It takes a directory of per-locus MSAs and masks (replaces with gaps) the loci of a genome that are inconsistent with vertical descent, such as contaminants, laterally transferred copies, paralogs and misaligned sequences. The method and its evaluation are documented in <code class="docutils literal notranslate"><span class="pre">MASK_DIVERGENT_LOCI.md</span></code>.</p>
+<ul>
+<li><p><strong>Low-identity test:</strong> a locus is masked when its identity to the genome’s nearest relatives (by AAI with the locus left out) falls more than <code class="docutils literal notranslate"><span class="pre">--outlier-threshold</span></code> points below the trend for that locus, in a majority of <code class="docutils literal notranslate"><span class="pre">--neighbours</span></code> comparisons.</p></li>
+<li><p><strong>High-identity test</strong> (on by default; <code class="docutils literal notranslate"><span class="pre">--no-upper-mask</span></code> disables it): a locus is masked when the genomes with the most similar copies are much less related to the genome than that identity predicts (<code class="docutils literal notranslate"><span class="pre">--upper-neighbours</span></code>, <code class="docutils literal notranslate"><span class="pre">--upper-window-size</span></code>, <code class="docutils literal notranslate"><span class="pre">--upper-outlier-threshold</span></code>).</p></li>
+<li><p><strong>Trend line:</strong> <code class="docutils literal notranslate"><span class="pre">--method</span></code> sets how the expected value is calculated. The default, <code class="docutils literal notranslate"><span class="pre">monotone-median</span></code>, is a running median over the <code class="docutils literal notranslate"><span class="pre">--window-size</span></code> nearest points, made non-decreasing. Points with tied x values share one expected value.</p></li>
+<li><p><strong>Overlap filters:</strong> <code class="docutils literal notranslate"><span class="pre">--min-aligned-frac</span></code> (default 0.5) and <code class="docutils literal notranslate"><span class="pre">--min-aligned-columns</span></code> (default 50).</p></li>
+<li><p><strong>Outputs:</strong> masked MSAs; every comparison of both tests; masked loci with vote counts and the source of each masked copy (best match, whether the matching genomes form one lineage, and, with <code class="docutils literal notranslate"><span class="pre">--taxonomy</span></code>, their lowest common taxon); per-locus and per-genome summaries, the latter flagging suspect genomes (<code class="docutils literal notranslate"><span class="pre">--suspect-masked-perc</span></code>) and the main source of their high-identity masks; and, with <code class="docutils literal notranslate"><span class="pre">--plot</span></code>, SVG and PNG plots of each locus.</p></li>
+</ul>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">examples/aai_matrix.rs</span></code>: writes the genome-by-genome AAI matrix of a directory of MSAs.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">analysis/mask_divergent_loci/</span></code>: scripts for the evaluation in <code class="docutils literal notranslate"><span class="pre">MASK_DIVERGENT_LOCI.md</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">CLAUDE.md</span></code>: guidance for working on the code base.</p></li>
+</ul>
+</section>
+<section id="fixed">
+<h3>Fixed<a class="headerlink" href="#fixed" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>The <code class="docutils literal notranslate"><span class="pre">column-stats</span></code> module (<code class="docutils literal notranslate"><span class="pre">src/stats/</span></code>) was missing from the repository, so 0.1.0 did not build from a clean checkout.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">prune-chi2</span></code> integration test: the ground truth had been stale since the off-by-one fix in f0badba.</p></li>
+</ul>
+</section>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="about/how_trim_works.html" class="btn btn-neutral float-left" title="How trim works" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="references.html" class="btn btn-neutral float-right" title="References" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2026, Donovan Parks.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

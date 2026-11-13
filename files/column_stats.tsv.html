@@ -1,0 +1,177 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>column_stats.tsv &mdash; gTrim 0.7.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../_static/theme_overrides.css?v=825081b2" />
+
+  
+    <link rel="shortcut icon" href="../_static/gtrim_favicon.png"/>
+    <link rel="canonical" href="https://cmc-aau.github.io/gTrim/files/column_stats.tsv.html" />
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=5a057da9"></script>
+      <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+      <script src="../_static/custom.js?v=d63a34f1"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="gtrim.log" href="gtrim.log.html" />
+    <link rel="prev" title="trimmed.genomes.tsv" href="trimmed.genomes.tsv.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html">
+            
+              <img src="../_static/gtrim_stacked.svg" class="logo" alt="Logo"/>
+          </a>
+<div class="version" style="text-align: center; margin-top: 10px; margin-bottom: 10px; font-weight: bold;">
+  v0.7.1
+</div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Getting started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../index.html">Home</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../installing.html">Installing gTrim</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../faq.html">FAQ</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Running gTrim</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../commands/index.html">Commands</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Files</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="index.html#input-files">Input files</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="index.html#output-files">Output files</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="alignment.html">Alignment (.fasta)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="mask.html">Mask (.mask)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pruned.tsv.html">pruned.tsv</a></li>
+<li class="toctree-l3"><a class="reference internal" href="trimmed.markers.tsv.html">trimmed.markers.tsv</a></li>
+<li class="toctree-l3"><a class="reference internal" href="trimmed.genomes.tsv.html">trimmed.genomes.tsv</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">column_stats.tsv</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#produced-by">Produced by</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#example">Example</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="gtrim.log.html">gtrim.log</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">About</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../about/how_trim_works.html">How trim works</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../changelog.html">Changelog</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../references.html">References</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">gTrim</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content style-external-links">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="index.html">Files</a></li>
+      <li class="breadcrumb-item active">column_stats.tsv</li>
+      <li class="wy-breadcrumbs-aside">
+              <a href="https://github.com/cmc-aau/gTrim/blob/main/docs/src/files/column_stats.tsv.rst" class="fa fa-github"> Edit on GitHub</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="column-stats-tsv">
+<span id="files-column-stats-tsv"></span><h1>column_stats.tsv<a class="headerlink" href="#column-stats-tsv" title="Link to this heading"></a></h1>
+<p>A tab-separated file with the gap and residue statistics of each column of the alignment, written to
+<code class="docutils literal notranslate"><span class="pre">[prefix].column_stats.tsv</span></code>. Percentages are of the number of sequences in the alignment and are given to two
+decimal places.</p>
+<p>The columns in this file are as follows:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">column_idx</span></code>: index of the column in the alignment, starting at 0.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">num_gaps</span></code>: number of sequences with a gap (<code class="docutils literal notranslate"><span class="pre">-</span></code> or <code class="docutils literal notranslate"><span class="pre">.</span></code>) in the column.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">gap_perc</span></code>: percentage of sequences with a gap in the column.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">num_residues</span></code>: number of sequences without a gap in the column.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">residue_perc</span></code>: percentage of sequences without a gap in the column.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">per_residue_counts</span></code>: comma-separated <code class="docutils literal notranslate"><span class="pre">residue:count</span></code> pairs for each character other than a gap, from most to
+least common. Empty if every sequence has a gap.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">per_residue_perc</span></code>: comma-separated <code class="docutils literal notranslate"><span class="pre">residue:percentage</span></code> pairs, in the same order as <code class="docutils literal notranslate"><span class="pre">per_residue_counts</span></code>.</p></li>
+</ul>
+<section id="produced-by">
+<h2>Produced by<a class="headerlink" href="#produced-by" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p><a class="reference internal" href="../commands/column-stats.html#commands-column-stats"><span class="std std-ref">column-stats</span></a></p></li>
+</ul>
+</section>
+<section id="example">
+<h2>Example<a class="headerlink" href="#example" title="Link to this heading"></a></h2>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>column_idx  num_gaps        gap_perc        num_residues    residue_perc    per_residue_counts      per_residue_perc
+0   10      100.00  0       0.00
+1   9       90.00   1       10.00   C:1     C:10.00
+2   8       80.00   2       20.00   G:2     G:20.00
+</pre></div>
+</div>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="trimmed.genomes.tsv.html" class="btn btn-neutral float-left" title="trimmed.genomes.tsv" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="gtrim.log.html" class="btn btn-neutral float-right" title="gtrim.log" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2026, Donovan Parks.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

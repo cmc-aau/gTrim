@@ -1,0 +1,74 @@
+/* Increase the width of the body */
+.wy-nav-content {
+    max-width: none;
+}
+
+/* Set the gTrim logo size */
+.wy-side-nav-search .wy-dropdown>a img.logo, .wy-side-nav-search>a img.logo {
+    width: 100%;
+    max-width: 200px;
+}
+
+/* Change the visited link colour */
+a:visited, a {
+    color: #A33A2C;
+}
+.wy-menu-vertical a {
+    color: #d9d9d9;
+}
+
+/* Style the header of each command line option */
+dl.std.option > dt {
+    display: table;
+    margin: 6px 0;
+    font-size: 80%;
+    line-height: normal;
+    background: #e8f3ea;
+    color: #A33A2C;
+    border-top: solid 3px #A33A2C;
+    padding: 6px;
+    position: relative;
+}
+dl.std.option > dt .sig-name, dl.std.option > dt .sig-prename {
+    color: #A33A2C;
+}
+
+/* Theme for gTrim */
+
+/* Top left background */
+.wy-side-nav-search, .wy-nav-top {
+    background: #f0eae9;
+}
+.wy-nav-top a {
+    color: #141414;
+}
+
+/* Background when a link is clicked on the left */
+.wy-menu-vertical a:active {
+    background: #A33A2C;
+}
+
+/* Border of search box */
+.wy-side-nav-search input[type=text] {
+    border-color: #A33A2C;
+}
+
+/* Set the version colour */
+.wy-side-nav-search>div.version {
+    color: #A33A2C;
+}
+
+/* Set the menu colour */
+.wy-menu-vertical header, .wy-menu-vertical p.caption {
+    color: #A33A2C;
+}
+
+/* Change the row colour when mouseover */
+.row-even:hover td, .row-odd:hover td {
+    background-color: #e5e5e5 !important;
+}
+
+/* Allow text in table cells to wrap instead of overflowing the page */
+.wy-table-responsive table td, .wy-table-responsive table th {
+    white-space: normal;
+}

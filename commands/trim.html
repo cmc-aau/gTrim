@@ -1,0 +1,278 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>trim &mdash; gTrim 0.7.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../_static/theme_overrides.css?v=825081b2" />
+
+  
+    <link rel="shortcut icon" href="../_static/gtrim_favicon.png"/>
+    <link rel="canonical" href="https://cmc-aau.github.io/gTrim/commands/trim.html" />
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=5a057da9"></script>
+      <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+      <script src="../_static/custom.js?v=d63a34f1"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="mask" href="mask.html" />
+    <link rel="prev" title="prune-gap" href="prune-gap.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html">
+            
+              <img src="../_static/gtrim_stacked.svg" class="logo" alt="Logo"/>
+          </a>
+<div class="version" style="text-align: center; margin-top: 10px; margin-bottom: 10px; font-weight: bold;">
+  v0.7.1
+</div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Getting started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../index.html">Home</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../installing.html">Installing gTrim</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../faq.html">FAQ</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Running gTrim</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Commands</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="prune-gap.html">prune-gap</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">trim</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#arguments">Arguments</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#required">Required</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#optional">Optional</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#files-output">Files output</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#example">Example</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#input">Input</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#output">Output</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="mask.html">mask</a></li>
+<li class="toctree-l2"><a class="reference internal" href="column-stats.html">column-stats</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../files/index.html">Files</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">About</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../about/how_trim_works.html">How trim works</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../changelog.html">Changelog</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../references.html">References</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">gTrim</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content style-external-links">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="index.html">Commands</a></li>
+      <li class="breadcrumb-item active">trim</li>
+      <li class="wy-breadcrumbs-aside">
+              <a href="https://github.com/cmc-aau/gTrim/blob/main/docs/src/commands/trim.rst" class="fa fa-github"> Edit on GitHub</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="trim">
+<span id="commands-trim"></span><h1>trim<a class="headerlink" href="#trim" title="Link to this heading"></a></h1>
+<p>Trim a concatenated marker gene alignment, such as the bac120 or ar53 alignments used by the GTDB. Columns are
+removed if they are gappy, highly conserved or poorly conserved, and the same number of columns can then be randomly
+sampled from each marker to obtain an alignment of a desired length. This reimplements the <code class="docutils literal notranslate"><span class="pre">msa_filter</span></code> command of
+<a class="reference external" href="https://github.com/dparks1134/GenomeTreeTk">GenomeTreeTk</a>. See <a class="reference internal" href="../about/how_trim_works.html#about-how-trim-works"><span class="std std-ref">How trim works</span></a> for a description of
+the filters and the subsampling, and how <code class="docutils literal notranslate"><span class="pre">trim</span></code> differs from <code class="docutils literal notranslate"><span class="pre">msa_filter</span></code>.</p>
+<p>By default (<code class="docutils literal notranslate"><span class="pre">--msa-length</span> <span class="pre">1000000</span></code>), every column that passes the filters is kept and no columns are subsampled.
+Use <code class="docutils literal notranslate"><span class="pre">--msa-length</span> <span class="pre">5000</span></code> to subsample a 5,000 column alignment, as done by <code class="docutils literal notranslate"><span class="pre">msa_filter</span></code> by default.</p>
+<section id="arguments">
+<h2>Arguments<a class="headerlink" href="#arguments" title="Link to this heading"></a></h2>
+<section id="required">
+<h3>Required<a class="headerlink" href="#required" title="Link to this heading"></a></h3>
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-gtrim-trim-i">
+<span id="cmdoption-gtrim-trim-alignment-file"></span><span class="sig-name descname"><span class="pre">-i</span></span><span class="sig-prename descclassname"></span><span class="sig-prename descclassname"><span class="pre">,</span> </span><span class="sig-name descname"><span class="pre">--alignment-file</span></span><span class="sig-prename descclassname"> <span class="pre">&lt;ALIGNMENT_FILE&gt;</span></span><a class="headerlink" href="#cmdoption-gtrim-trim-i" title="Link to this definition"></a></dt>
+<dd><p>File containing the concatenated marker gene alignment.</p>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-gtrim-trim-m">
+<span id="cmdoption-gtrim-trim-marker-info-file"></span><span class="sig-name descname"><span class="pre">-m</span></span><span class="sig-prename descclassname"></span><span class="sig-prename descclassname"><span class="pre">,</span> </span><span class="sig-name descname"><span class="pre">--marker-info-file</span></span><span class="sig-prename descclassname"> <span class="pre">&lt;MARKER_INFO_FILE&gt;</span></span><a class="headerlink" href="#cmdoption-gtrim-trim-m" title="Link to this definition"></a></dt>
+<dd><p>Tab-separated file listing the markers in the order they are concatenated in the alignment
+(see <a class="reference internal" href="../files/markers_info.tsv.html#files-markers-info-tsv"><span class="std std-ref">markers_info.tsv</span></a>). The marker lengths must sum to the length of the alignment.</p>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-gtrim-trim-o">
+<span id="cmdoption-gtrim-trim-out-dir"></span><span class="sig-name descname"><span class="pre">-o</span></span><span class="sig-prename descclassname"></span><span class="sig-prename descclassname"><span class="pre">,</span> </span><span class="sig-name descname"><span class="pre">--out-dir</span></span><span class="sig-prename descclassname"> <span class="pre">&lt;OUT_DIR&gt;</span></span><a class="headerlink" href="#cmdoption-gtrim-trim-o" title="Link to this definition"></a></dt>
+<dd><p>Output directory.</p>
+</dd></dl>
+
+</section>
+<section id="optional">
+<h3>Optional<a class="headerlink" href="#optional" title="Link to this heading"></a></h3>
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-gtrim-trim-msa-length">
+<span class="sig-name descname"><span class="pre">--msa-length</span></span><span class="sig-prename descclassname"> <span class="pre">&lt;MSA_LENGTH&gt;</span></span><a class="headerlink" href="#cmdoption-gtrim-trim-msa-length" title="Link to this definition"></a></dt>
+<dd><p>Desired length of the alignment after randomly subsampling the same number of columns from each marker. The
+smallest number of columns per marker that gives an alignment of at least this length is used. If fewer columns
+pass the filters, every column passing the filters is kept.</p>
+<p>Default: <code class="docutils literal notranslate"><span class="pre">1000000</span></code></p>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-gtrim-trim-min-perc-aa">
+<span class="sig-name descname"><span class="pre">--min-perc-aa</span></span><span class="sig-prename descclassname"> <span class="pre">&lt;MIN_PERC_AA&gt;</span></span><a class="headerlink" href="#cmdoption-gtrim-trim-min-perc-aa" title="Link to this definition"></a></dt>
+<dd><p>Minimum percentage of sequences with a residue (not a gap) required to retain a column.</p>
+<p>Default: <code class="docutils literal notranslate"><span class="pre">50</span></code></p>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-gtrim-trim-min-consensus">
+<span class="sig-name descname"><span class="pre">--min-consensus</span></span><span class="sig-prename descclassname"> <span class="pre">&lt;MIN_CONSENSUS&gt;</span></span><a class="headerlink" href="#cmdoption-gtrim-trim-min-consensus" title="Link to this definition"></a></dt>
+<dd><p>Minimum percentage of residues that must be the most common residue to retain a column (inclusive).</p>
+<p>Default: <code class="docutils literal notranslate"><span class="pre">25</span></code></p>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-gtrim-trim-max-consensus">
+<span class="sig-name descname"><span class="pre">--max-consensus</span></span><span class="sig-prename descclassname"> <span class="pre">&lt;MAX_CONSENSUS&gt;</span></span><a class="headerlink" href="#cmdoption-gtrim-trim-max-consensus" title="Link to this definition"></a></dt>
+<dd><p>Maximum percentage of residues that can be the most common residue to retain a column (exclusive). Must be
+greater than <code class="docutils literal notranslate"><span class="pre">--min-consensus</span></code>.</p>
+<p>Default: <code class="docutils literal notranslate"><span class="pre">95</span></code></p>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-gtrim-trim-seed">
+<span class="sig-name descname"><span class="pre">--seed</span></span><span class="sig-prename descclassname"> <span class="pre">&lt;SEED&gt;</span></span><a class="headerlink" href="#cmdoption-gtrim-trim-seed" title="Link to this definition"></a></dt>
+<dd><p>Seed for randomly subsampling columns. The same seed gives the same columns for any number of threads.</p>
+<p>Default: <code class="docutils literal notranslate"><span class="pre">42</span></code></p>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-gtrim-trim-t">
+<span id="cmdoption-gtrim-trim-threads"></span><span class="sig-name descname"><span class="pre">-t</span></span><span class="sig-prename descclassname"></span><span class="sig-prename descclassname"><span class="pre">,</span> </span><span class="sig-name descname"><span class="pre">--threads</span></span><span class="sig-prename descclassname"> <span class="pre">&lt;THREADS&gt;</span></span><a class="headerlink" href="#cmdoption-gtrim-trim-t" title="Link to this definition"></a></dt>
+<dd><p>Number of threads, in the range [1, 1024].</p>
+<p>Default: <code class="docutils literal notranslate"><span class="pre">1</span></code></p>
+</dd></dl>
+
+</section>
+</section>
+<section id="files-output">
+<h2>Files output<a class="headerlink" href="#files-output" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p><a class="reference internal" href="../files/alignment.html#files-alignment"><span class="std std-ref">[prefix].trimmed.fasta</span></a></p></li>
+<li><p><a class="reference internal" href="../files/mask.html#files-mask"><span class="std std-ref">[prefix].trimmed.mask</span></a></p></li>
+<li><p><a class="reference internal" href="../files/mask.html#files-mask"><span class="std std-ref">[prefix].trimmed.filtered.mask</span></a></p></li>
+<li><p><a class="reference internal" href="../files/trimmed.markers.tsv.html#files-trimmed-markers-tsv"><span class="std std-ref">[prefix].trimmed.markers.tsv</span></a></p></li>
+<li><p><a class="reference internal" href="../files/trimmed.genomes.tsv.html#files-trimmed-genomes-tsv"><span class="std std-ref">[prefix].trimmed.genomes.tsv</span></a></p></li>
+<li><p><a class="reference internal" href="../files/gtrim.log.html#files-gtrim-log"><span class="std std-ref">gtrim.log</span></a></p></li>
+</ul>
+</section>
+<section id="example">
+<h2>Example<a class="headerlink" href="#example" title="Link to this heading"></a></h2>
+<section id="input">
+<h3>Input<a class="headerlink" href="#input" title="Link to this heading"></a></h3>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>gtrim<span class="w"> </span>trim<span class="w"> </span>-i<span class="w"> </span>trim_test.faa.gz<span class="w"> </span>-m<span class="w"> </span>trim_test_markers_info.tsv<span class="w"> </span>-o<span class="w"> </span>out_trim<span class="w"> </span>--msa-length<span class="w"> </span><span class="m">500</span><span class="w"> </span>-t<span class="w"> </span><span class="m">4</span>
+</pre></div>
+</div>
+</section>
+<section id="output">
+<h3>Output<a class="headerlink" href="#output" title="Link to this heading"></a></h3>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>[2026-11-14 03:16:57] INFO: gtrim v0.7.1
+[2026-11-14 03:16:57] INFO: gtrim trim -i trim_test.faa.gz -m trim_test_markers_info.tsv -o out_trim --msa-length 500 -t 4
+[2026-11-14 03:16:57] INFO: Using 4 threads.
+[2026-11-14 03:16:57] INFO: Starting MSA trimming workflow.
+[2026-11-14 03:16:57] INFO: Reading marker info file: trim_test_markers_info.tsv
+[2026-11-14 03:16:57] INFO: Read 10 markers with a concatenated length of 1792 columns.
+[2026-11-14 03:16:57] INFO: Reading alignment from file: trim_test.faa.gz
+[2026-11-14 03:16:57] INFO: Alignment contains 200 sequences and 1792 columns.
+[2026-11-14 03:16:57] INFO: Sequence type detected: amino acid
+[2026-11-14 03:16:57] INFO: Filtering columns with &lt; 50% residues, &lt; 25% consensus, or &gt;= 95% consensus.
+[2026-11-14 03:16:57] INFO: Gappy columns: 73
+[2026-11-14 03:16:57] INFO: Conserved columns: 211
+[2026-11-14 03:16:57] INFO: Unconserved columns: 213
+[2026-11-14 03:16:57] INFO: Retained 1295 columns (min: 53, max: 280 per marker) after filtering.
+[2026-11-14 03:16:57] INFO: Randomly subsampling columns to obtain an MSA of ~500 columns (seed = 42).
+[2026-11-14 03:16:57] INFO: Sampling up to 50 columns from each marker.
+[2026-11-14 03:16:57] INFO: 0 markers had fewer than 50 columns available for sampling.
+[2026-11-14 03:16:57] INFO: Trimmed MSA has 500 columns.
+[2026-11-14 03:16:57] INFO: Writing trimmed alignment to file.
+[2026-11-14 03:16:57] INFO: Execution time: 0.01 seconds
+</pre></div>
+</div>
+<p>This writes <code class="docutils literal notranslate"><span class="pre">trim_test.trimmed.fasta.gz</span></code>, <code class="docutils literal notranslate"><span class="pre">trim_test.trimmed.mask</span></code>, <code class="docutils literal notranslate"><span class="pre">trim_test.trimmed.filtered.mask</span></code>,
+<code class="docutils literal notranslate"><span class="pre">trim_test.trimmed.markers.tsv</span></code>, <code class="docutils literal notranslate"><span class="pre">trim_test.trimmed.genomes.tsv</span></code> and <code class="docutils literal notranslate"><span class="pre">gtrim.log</span></code> to <code class="docutils literal notranslate"><span class="pre">out_trim</span></code>. The input
+files are in <code class="docutils literal notranslate"><span class="pre">tests/input_file/</span></code> of the gTrim repository.</p>
+</section>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="prune-gap.html" class="btn btn-neutral float-left" title="prune-gap" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="mask.html" class="btn btn-neutral float-right" title="mask" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2026, Donovan Parks.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
