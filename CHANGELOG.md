@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.7.2
+
+### Changed
+
+- The README shows the stacked gTrim logo, with "gTrim" centred below the mark, as in the gPlace and gTranslate READMEs. A dark-mode version (`docs/src/_static/gtrim_stacked_dark.svg`, with a light "g") is shown when GitHub uses a dark theme.
+
 ## 0.7.1
 
 ### Added
