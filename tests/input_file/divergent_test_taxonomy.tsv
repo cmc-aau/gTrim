@@ -1,5 +1,0 @@
-# Synthetic taxonomy for tests (not real classifications): the planted focal genome and the donor lineage
-# are placed in different classes of the same phylum. GB_ prefix tests GTDB-style IDs.
-GCA_047655925.1	d__Eukaryota;p__Phylum1;c__Class1;o__Order1;f__Family1;g__Genus1;s__Genus1 sp1
-GCA_958449795.1	d__Eukaryota;p__Phylum1;c__Class2;o__Order2;f__Family2;g__Genus2;s__Genus2 sp1
-GB_GCA_958450285.1	d__Eukaryota;p__Phylum1;c__Class2;o__Order2;f__Family2;g__Genus2;s__Genus2 sp2
