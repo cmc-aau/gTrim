@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.3.0
+
+### Removed
+
+- `prune-chi2` subcommand and its module (`src/prune/chi2/`), integration test and test data.
+- `mask-divergent-loci` subcommand and its module (`src/prune/divergent/`), integration test, test data and test-set script, `examples/aai_matrix.rs`, the example plots in `example_files/`, the methodology document `MASK_DIVERGENT_LOCI.md` and the evaluation scripts in `analysis/mask_divergent_loci/`.
+- `src/progress.rs` and the dependencies used only by the removed commands: `csv`, `indicatif`, `rand`, `rand_chacha`, `resvg`, `serde`, `serde_json` and `flate2` (dev).
+
+### Changed
+
+- `README.md` and `CLAUDE.md` describe the remaining commands (`prune-gap`, `mask`, `column-stats`).
+
 ## 0.2.0
 
 ### Added
