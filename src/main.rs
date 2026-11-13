@@ -10,6 +10,7 @@ use gtrim::logging;
 use gtrim::cli;
 use gtrim::prune::gap::gap_pruner;
 use gtrim::prune::mask::mask_pruner;
+use gtrim::prune::trim::msa_trimmer;
 use gtrim::stats::column_stats;
 
 /// Common initialization required by all commands.
@@ -92,6 +93,29 @@ fn column_stats(args: &cli::ColumnStatsArgs) -> Result<()> {
     Ok(())
 }
 
+/// Filter gappy and (un)conserved columns, then subsample columns from each marker.
+fn trim(args: &cli::TrimArgs) -> Result<()> {
+    init(&args.out_dir, args.threads)?;
+
+    let mut trimmer = msa_trimmer::MsaTrimmer::new(
+        args.alignment_file.clone(),
+        args.marker_info_file.clone(),
+        args.msa_length,
+        args.min_perc_aa,
+        args.min_consensus,
+        args.max_consensus,
+        args.seed,
+        args.out_dir.clone(),
+    );
+
+    if let Err(e) = trimmer.run() {
+        error!("Error: {}", e);
+        std::process::exit(1);
+    }
+
+    Ok(())
+}
+
 fn main() -> Result<()> {
     let start_time = Instant::now();
 
@@ -106,6 +130,9 @@ fn main() -> Result<()> {
         }
         cli::Commands::ColumnStats(args) => {
             column_stats(args)?;
+        }
+        cli::Commands::Trim(args) => {
+            trim(args)?;
         }
     }
     
