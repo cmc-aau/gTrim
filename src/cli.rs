@@ -6,11 +6,11 @@ const DEFAULT_GAP_THRESHOLD: f64 = 100.0;
 const DEFAULT_MAX_RESIDUE_PRUNED: usize = 100000;
 const DEFAULT_NUM_THREADS: usize = 1;
 
-const DEFAULT_MSA_LENGTH: usize = 5000;
+const DEFAULT_MSA_LENGTH: usize = 1_000_000;
 const DEFAULT_MIN_PERC_AA: f64 = 50.0;
 const DEFAULT_MIN_CONSENSUS: f64 = 25.0;
 const DEFAULT_MAX_CONSENSUS: f64 = 95.0;
-const DEFAULT_SEED: u64 = 12345;
+const DEFAULT_SEED: u64 = 42;
 
 #[derive(Parser)]
 #[command(author, version, about, long_about = None)]
@@ -27,14 +27,14 @@ pub enum Commands {
     /// Prune columns based on gap threshold
     PruneGap(PruneGapArgs),
 
+    /// Filter gappy, highly conserved, or poorly conserved columns and subsample columns from each marker.
+    Trim(TrimArgs),
+
     /// Apply mask to multiple sequence alignment.
     Mask(MaskArgs),
 
     /// Calculate column statistics.
     ColumnStats(ColumnStatsArgs),
-
-    /// Filter gappy, highly conserved, or poorly conserved columns and subsample columns from each marker.
-    Trim(TrimArgs),
 }
 
 #[derive(Parser)]
@@ -54,40 +54,6 @@ pub struct PruneGapArgs {
     /// Maximum number of columns to prune.
     #[arg(long, help_heading = "Optional", default_value_t = DEFAULT_MAX_RESIDUE_PRUNED, value_parser = validate_max_residue_pruned)]
     pub max_residue_pruned: usize,
-
-    /// Number of threads to use for pruning columns.
-    #[arg(short = 't', long, help_heading = "Optional", default_value_t = DEFAULT_NUM_THREADS, value_parser = validate_threads)]
-    pub threads: usize,
-}
-
-#[derive(Parser)]
-pub struct MaskArgs {
-    /// File containing the multiple sequence alignment.
-    #[arg(short = 'i', long, help_heading = "Required", value_parser = validate_input_file, required = true)]
-    pub alignment_file: String,
-
-    /// File containing the binary mask.
-    #[arg(short = 'm', long, help_heading = "Required", value_parser = validate_file, required = true)]
-    pub mask_file: String,
-
-    /// Output directory.
-    #[arg(short = 'o', long, help_heading = "Required", required = true)]
-    pub out_dir: String,
-
-    /// Number of threads to use for pruning columns.
-    #[arg(short = 't', long, help_heading = "Optional", default_value_t = DEFAULT_NUM_THREADS, value_parser = validate_threads)]
-    pub threads: usize,
-}
-
-#[derive(Parser)]
-pub struct ColumnStatsArgs {
-    /// File containing the multiple sequence alignment.
-    #[arg(short = 'i', long, help_heading = "Required", value_parser = validate_input_file, required = true)]
-    pub alignment_file: String,
-
-    /// Output directory.
-    #[arg(short = 'o', long, help_heading = "Required", required = true)]
-    pub out_dir: String,
 
     /// Number of threads to use for pruning columns.
     #[arg(short = 't', long, help_heading = "Optional", default_value_t = DEFAULT_NUM_THREADS, value_parser = validate_threads)]
@@ -130,6 +96,40 @@ pub struct TrimArgs {
     pub seed: u64,
 
     /// Number of threads.
+    #[arg(short = 't', long, help_heading = "Optional", default_value_t = DEFAULT_NUM_THREADS, value_parser = validate_threads)]
+    pub threads: usize,
+}
+
+#[derive(Parser)]
+pub struct MaskArgs {
+    /// File containing the multiple sequence alignment.
+    #[arg(short = 'i', long, help_heading = "Required", value_parser = validate_input_file, required = true)]
+    pub alignment_file: String,
+
+    /// File containing the binary mask.
+    #[arg(short = 'm', long, help_heading = "Required", value_parser = validate_file, required = true)]
+    pub mask_file: String,
+
+    /// Output directory.
+    #[arg(short = 'o', long, help_heading = "Required", required = true)]
+    pub out_dir: String,
+
+    /// Number of threads to use for pruning columns.
+    #[arg(short = 't', long, help_heading = "Optional", default_value_t = DEFAULT_NUM_THREADS, value_parser = validate_threads)]
+    pub threads: usize,
+}
+
+#[derive(Parser)]
+pub struct ColumnStatsArgs {
+    /// File containing the multiple sequence alignment.
+    #[arg(short = 'i', long, help_heading = "Required", value_parser = validate_input_file, required = true)]
+    pub alignment_file: String,
+
+    /// Output directory.
+    #[arg(short = 'o', long, help_heading = "Required", required = true)]
+    pub out_dir: String,
+
+    /// Number of threads to use for pruning columns.
     #[arg(short = 't', long, help_heading = "Optional", default_value_t = DEFAULT_NUM_THREADS, value_parser = validate_threads)]
     pub threads: usize,
 }

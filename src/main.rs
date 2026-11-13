@@ -58,6 +58,29 @@ fn prune_gap(args: &cli::PruneGapArgs) -> Result<()> {
     Ok(())
 }
 
+/// Filter gappy and (un)conserved columns, then subsample columns from each marker.
+fn trim(args: &cli::TrimArgs) -> Result<()> {
+    init(&args.out_dir, args.threads)?;
+
+    let mut trimmer = msa_trimmer::MsaTrimmer::new(
+        args.alignment_file.clone(),
+        args.marker_info_file.clone(),
+        args.msa_length,
+        args.min_perc_aa,
+        args.min_consensus,
+        args.max_consensus,
+        args.seed,
+        args.out_dir.clone(),
+    );
+
+    if let Err(e) = trimmer.run() {
+        error!("Error: {}", e);
+        std::process::exit(1);
+    }
+
+    Ok(())
+}
+
 /// Apply mask to multiple sequence alignment.
 fn mask(args: &cli::MaskArgs) -> Result<()> {
     init(&args.out_dir, 1)?;
@@ -93,29 +116,6 @@ fn column_stats(args: &cli::ColumnStatsArgs) -> Result<()> {
     Ok(())
 }
 
-/// Filter gappy and (un)conserved columns, then subsample columns from each marker.
-fn trim(args: &cli::TrimArgs) -> Result<()> {
-    init(&args.out_dir, args.threads)?;
-
-    let mut trimmer = msa_trimmer::MsaTrimmer::new(
-        args.alignment_file.clone(),
-        args.marker_info_file.clone(),
-        args.msa_length,
-        args.min_perc_aa,
-        args.min_consensus,
-        args.max_consensus,
-        args.seed,
-        args.out_dir.clone(),
-    );
-
-    if let Err(e) = trimmer.run() {
-        error!("Error: {}", e);
-        std::process::exit(1);
-    }
-
-    Ok(())
-}
-
 fn main() -> Result<()> {
     let start_time = Instant::now();
 
@@ -125,14 +125,14 @@ fn main() -> Result<()> {
         cli::Commands::PruneGap(args) => {
             prune_gap(args)?;
         }
+        cli::Commands::Trim(args) => {
+            trim(args)?;
+        }
         cli::Commands::Mask(args) => {
             mask(args)?;
         }
         cli::Commands::ColumnStats(args) => {
             column_stats(args)?;
-        }
-        cli::Commands::Trim(args) => {
-            trim(args)?;
         }
     }
     
