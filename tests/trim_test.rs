@@ -34,14 +34,14 @@ fn test_trim() {
         panic!("Command executed with failing error code");
     }
 
-    let prefix = "trim_test_l500_aa50_c25-95_trimmed";
+    let prefix = "trim_test.trimmed";
     let generated = |suffix: &str| output_dir.join(format!("{}{}", prefix, suffix));
     let expected = |suffix: &str| Path::new("./tests/ground_truth").join(format!("{}{}", prefix, suffix));
 
-    compare_mask_files(&generated("_filtered.mask"), &expected("_filtered.mask"));
+    compare_mask_files(&generated(".filtered.mask"), &expected(".filtered.mask"));
     compare_mask_files(&generated(".mask"), &expected(".mask"));
-    compare_tsv_files(&generated("_markers.tsv"), &expected("_markers.tsv"), 1e-6, 9);
-    compare_tsv_files(&generated("_genomes.tsv"), &expected("_genomes.tsv"), 1e-6, 4);
+    compare_tsv_files(&generated(".markers.tsv"), &expected(".markers.tsv"), 1e-6, 9);
+    compare_tsv_files(&generated(".genomes.tsv"), &expected(".genomes.tsv"), 1e-6, 4);
     compare_fasta_files(&generated(".fasta.gz"), &expected(".fasta.gz"));
 }
 

@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.7.0
+
+### Changed
+
+- Output file names no longer encode parameter values. Each command adds a word for the command to the input name (with `.gz`, `.faa`, `.fna` or `.fasta` removed): `.pruned` (`prune-gap`), `.trimmed` (`trim`), `.masked` (`mask`) and `.column_stats` (`column-stats`). For example, `trim` on `gtdb_r237_bac120_concatenated.masked.faa.gz` now writes `gtdb_r237_bac120_concatenated.masked.trimmed.fasta.gz` instead of `gtdb_r237_bac120_concatenated.masked_l5000_aa50_c25-95_trimmed.fasta.gz`. Companion files use `.` instead of `_`: `.trimmed.filtered.mask`, `.trimmed.markers.tsv`, `.trimmed.genomes.tsv`, `.pruned.tsv`, `.pruned.mask`.
+- Test ground-truth files renamed to match; their contents are unchanged.
+
 ## 0.6.0
 
 ### Changed

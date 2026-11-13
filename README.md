@@ -13,6 +13,8 @@ Toolkit for pruning multiple sequence alignments.
 
 Input alignments can be FASTA files (`.faa`, `.fna`, `.fasta`), optionally gzip-compressed (`.gz`). If the input is compressed, the output alignment is also compressed.
 
+Output files are named after the input file, with the `.gz`, `.faa`, `.fna` or `.fasta` extension removed and a word for the command added. For example, `trim` on `gtdb_r237_bac120_concatenated.masked.faa.gz` writes `gtdb_r237_bac120_concatenated.masked.trimmed.fasta.gz`. Parameter values are not included in output file names.
+
 ## Usage
 
 Prune columns with more than 50% gaps:
@@ -29,7 +31,7 @@ Options:
 - `--max-residue-pruned`: maximum number of columns to prune (default: 100000).
 - `-t/--threads`: number of threads (default: 1).
 
-Outputs `<prefix>_gt{threshold}_m{max}_pruned.fasta` (the pruned alignment), a `.tsv` with per-column gap statistics and a `.mask` file.
+Outputs `<input>.pruned.fasta` (the pruned alignment), `<input>.pruned.tsv` with per-column gap statistics and `<input>.pruned.mask`.
 
 Trim a concatenated marker gene alignment:
 
@@ -49,13 +51,13 @@ Options:
 - `--seed`: seed for the random subsampling (default: 42).
 - `-t/--threads`: number of threads (default: 1).
 
-Gaps are `-`, `.`, `_` and `*`. Outputs, with the prefix `<input>_l{msa_length}_aa{min_perc_aa}_c{min}-{max}_trimmed`:
+Gaps are `-`, `.`, `_` and `*`. Outputs, with the prefix `<input>.trimmed`:
 
 - `.fasta`: the trimmed alignment.
 - `.mask`: columns in the trimmed alignment.
-- `_filtered.mask`: columns that passed the filters, before subsampling.
-- `_markers.tsv`: per-marker counts of retained, sampled, gappy, conserved and unconserved columns.
-- `_genomes.tsv`: number and percentage of residues in each sequence of the trimmed alignment.
+- `.filtered.mask`: columns that passed the filters, before subsampling.
+- `.markers.tsv`: per-marker counts of retained, sampled, gappy, conserved and unconserved columns.
+- `.genomes.tsv`: number and percentage of residues in each sequence of the trimmed alignment.
 
 Apply a mask to an alignment:
 
@@ -63,7 +65,7 @@ Apply a mask to an alignment:
 gtrim mask -i <msa_file> -m <mask_file> -o <out_dir>
 ```
 
-Outputs `<prefix>_masked.fasta`.
+Outputs `<input>.masked.fasta`.
 
 Calculate column statistics:
 
@@ -71,4 +73,4 @@ Calculate column statistics:
 gtrim column-stats -i <msa_file> -o <out_dir>
 ```
 
-Outputs `<prefix>_column_stats.tsv`.
+Outputs `<input>.column_stats.tsv`.

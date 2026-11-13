@@ -48,7 +48,7 @@ impl MaskPruner {
 
         // write results to output files
         let output_prefix = get_output_prefix(&self.alignment_file, &self.out_dir)?;
-        let output_suffix = "_masked.fasta";
+        let output_suffix = ".masked.fasta";
 
         info!("Writing filtered alignment to file.");
         let output_alignment_file = format!("{}{}", output_prefix, output_suffix);

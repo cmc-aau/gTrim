@@ -27,15 +27,15 @@ fn test_prune_gap() {
         panic!("Command executed with failing error code");
     }
 
-    let generated_stats_path = output_dir.join("gap_test_gt50_m100000_pruned.tsv");
-    let expected_stats_path = Path::new("./tests/ground_truth/gap_test_gt50_m100000_pruned.tsv");
+    let generated_stats_path = output_dir.join("gap_test.pruned.tsv");
+    let expected_stats_path = Path::new("./tests/ground_truth/gap_test.pruned.tsv");
     compare_tsv_files(&generated_stats_path, expected_stats_path, 1e-6, 4);
 
-    let generated_fasta_path = output_dir.join("gap_test_gt50_m100000_pruned.fasta.gz");
-    let expected_fasta_path = Path::new("./tests/ground_truth/gap_test_gt50_m100000_pruned.fasta.gz");
+    let generated_fasta_path = output_dir.join("gap_test.pruned.fasta.gz");
+    let expected_fasta_path = Path::new("./tests/ground_truth/gap_test.pruned.fasta.gz");
     compare_fasta_files(&generated_fasta_path, expected_fasta_path);
 
-    let generated_mask_path = output_dir.join("gap_test_gt50_m100000_pruned.mask");
-    let expected_mask_path = Path::new("./tests/ground_truth/gap_test_gt50_m100000_pruned.mask");
+    let generated_mask_path = output_dir.join("gap_test.pruned.mask");
+    let expected_mask_path = Path::new("./tests/ground_truth/gap_test.pruned.mask");
     compare_mask_files(&generated_mask_path, expected_mask_path);
 }

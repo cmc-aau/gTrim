@@ -16,7 +16,7 @@ fn test_prune_gap() {
         .arg("-i")
         .arg("./tests/input_file/gap_test.fna.gz")
         .arg("--mask-file")
-        .arg("./tests/ground_truth/gap_test_gt50_m100000_pruned.mask")
+        .arg("./tests/ground_truth/gap_test.pruned.mask")
         .arg("-o")
         .arg(output_dir);
 
@@ -27,7 +27,7 @@ fn test_prune_gap() {
         panic!("Command executed with failing error code");
     }
 
-    let generated_fasta_path = output_dir.join("gap_test_masked.fasta.gz");
-    let expected_fasta_path = Path::new("./tests/ground_truth/gap_test_masked.fasta.gz");
+    let generated_fasta_path = output_dir.join("gap_test.masked.fasta.gz");
+    let expected_fasta_path = Path::new("./tests/ground_truth/gap_test.masked.fasta.gz");
     compare_fasta_files(&generated_fasta_path, expected_fasta_path);
 }
