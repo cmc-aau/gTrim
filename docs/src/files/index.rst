@@ -17,6 +17,7 @@ Input files
    :maxdepth: 1
 
    markers_info.tsv
+   witchi.tsv
 
 Output files
 ------------

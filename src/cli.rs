@@ -75,6 +75,11 @@ pub struct TrimArgs {
     #[arg(short = 'o', long, help_heading = "Required", required = true)]
     pub out_dir: String,
 
+    /// Columns of the full concatenated alignment that were removed before trimming (e.g. by WitChi); the alignment must contain only the retained columns.
+    /// Either a WitChi pruned TSV giving the 0-based index of each removed column in an 'Original Index' column, or a binary mask as used by the mask command (a single line of 0s and 1s, one per column, 1 = retained).
+    #[arg(long, help_heading = "Optional", value_parser = validate_file)]
+    pub mask_file: Option<String>,
+
     /// Desired length of the alignment after randomly subsampling the same number of columns from each marker.
     #[arg(long, help_heading = "Optional", default_value_t = DEFAULT_MSA_LENGTH, value_parser = validate_msa_length)]
     pub msa_length: usize,

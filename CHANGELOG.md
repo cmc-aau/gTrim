@@ -1,5 +1,20 @@
 # Changelog
 
+## 0.8.0
+
+### Added
+
+- `trim --mask-file`: the columns of the full concatenated alignment that were removed before trimming, e.g. by WitChi. This is the `--witchi_info_file` input of GenomeTreeTk `msa_filter`. The file can be a WitChi `*_pruned.tsv` (the 0-based index of each removed column in an `Original Index` column) or a binary mask as used by `mask`; the format is detected from the content. The alignment then contains only the retained columns, and each marker's length is reduced by the number of its columns that were removed so that the alignment's columns are assigned to the correct markers.
+  - Checks that the inputs line up: a binary mask must have one character per column described by the marker info file; WitChi indices must be within the summed marker length and listed only once; and the number of retained columns must equal the alignment length.
+  - Output masks (`.trimmed.mask`, `.trimmed.filtered.mask`) cover the full alignment, as in `msa_filter`, so removed columns are `0`.
+  - The log reports how many removed columns are the first column of a marker. `msa_filter` attributes such a column to the preceding marker (its `find_marker` compares with `<=`), so the per-marker statistics of the affected markers differ from gTrim's; otherwise the output matches `msa_filter` (checked on 5,000 genomes with 2,500 columns removed).
+- Test data for `trim` with a mask (`tests/input_file/trim_test_witchi.*`) and integration tests for WitChi and binary masks and for mismatched inputs.
+- Documentation of the WitChi pruned TSV format (`docs/src/files/witchi.tsv.rst`).
+
+### Changed
+
+- `.trimmed.markers.tsv` has a new `masked_columns` column after `length`: the number of columns of the marker removed by `--mask-file` (0 without one). `masked_columns`, `retained_columns`, `gappy_columns`, `conserved_columns` and `unconserved_columns` sum to `length`.
+
 ## 0.7.2
 
 ### Changed

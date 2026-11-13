@@ -65,6 +65,7 @@ fn trim(args: &cli::TrimArgs) -> Result<()> {
     let mut trimmer = msa_trimmer::MsaTrimmer::new(
         args.alignment_file.clone(),
         args.marker_info_file.clone(),
+        args.mask_file.clone(),
         args.msa_length,
         args.min_perc_aa,
         args.min_consensus,
