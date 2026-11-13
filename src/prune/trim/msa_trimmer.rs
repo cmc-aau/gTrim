@@ -315,22 +315,6 @@ impl MsaTrimmer {
             markers_masked
         );
 
-        // GenomeTreeTk msa_filter assigns a removed column at the start of a marker to the preceding marker
-        let mut start = 0;
-        let mut first_cols_removed = 0;
-        for marker in &markers[..markers.len() - 1] {
-            start += marker.length;
-            if start < concat_len && !mask.retained[start] {
-                first_cols_removed += 1;
-            }
-        }
-        if first_cols_removed > 0 {
-            info!(
-                "The mask removes the first column of {} markers. GenomeTreeTk msa_filter attributes such a column to the preceding marker, so its per-marker statistics and sampled columns will differ.",
-                first_cols_removed
-            );
-        }
-
         let empty: Vec<&str> = markers
             .iter()
             .zip(&marker_lens)

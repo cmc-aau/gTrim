@@ -78,9 +78,9 @@ marker. It differs in the following ways:
 * ``--mask-file`` accepts a binary mask as well as a WitChi pruned TSV.
 * ``msa_filter`` assigns a removed column that is the first column of a marker (other than the first marker) to the
   preceding marker, so the boundary between the two markers is shifted by one column in the input alignment. ``trim``
-  assigns each removed column to the marker it belongs to, and reports in the log how many removed columns are the
-  first column of a marker. When there are any, the filtered columns are the same, but the per-marker statistics and
-  the number of columns sampled from the affected markers can differ from ``msa_filter``.
+  assigns each removed column to the marker it belongs to. When a removed column is the first column of a marker,
+  the filtered columns are the same, but the per-marker statistics and the number of columns sampled from the
+  affected markers can differ from ``msa_filter``.
 
 The ``--min-perc-aa`` option filters columns, not genomes, despite the wording of the ``msa_filter`` help text.
 

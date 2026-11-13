@@ -66,8 +66,7 @@ pub struct TrimArgs {
     #[arg(short = 'i', long, help_heading = "Required", value_parser = validate_input_file, required = true)]
     pub alignment_file: String,
 
-    /// Tab-separated file listing the markers in the order they are concatenated in the alignment.
-    /// Requires the columns 'Marker Id', 'Description' and 'Length (bp)' (e.g. gtdb_r<release>_bac120_markers_info.tsv).
+    /// Tab-separated file with the 'Marker Id', 'Description' and 'Length (bp)' of each marker, in alignment order.
     #[arg(short = 'm', long, help_heading = "Required", value_parser = validate_file, required = true)]
     pub marker_info_file: String,
 
@@ -75,8 +74,7 @@ pub struct TrimArgs {
     #[arg(short = 'o', long, help_heading = "Required", required = true)]
     pub out_dir: String,
 
-    /// Columns of the full concatenated alignment that were removed before trimming (e.g. by WitChi); the alignment must contain only the retained columns.
-    /// Either a WitChi pruned TSV giving the 0-based index of each removed column in an 'Original Index' column, or a binary mask as used by the mask command (a single line of 0s and 1s, one per column, 1 = retained).
+    /// Columns removed from the full alignment before trimming, as a WitChi pruned TSV or binary mask.
     #[arg(long, help_heading = "Optional", value_parser = validate_file)]
     pub mask_file: Option<String>,
 

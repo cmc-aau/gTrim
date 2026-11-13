@@ -43,11 +43,11 @@ Optional
 
 .. option:: --mask-file <MASK_FILE>
 
-   Columns of the full concatenated alignment that were removed before trimming (e.g. by WitChi); the alignment
-   must contain only the retained columns. Either a :ref:`WitChi pruned TSV <files/witchi.tsv>` giving the 0-based
-   index of each removed column in an ``Original Index`` column, or a :ref:`binary mask <files/mask>` as used by
-   :ref:`commands/mask` (a single line of 0s and 1s, one per column, ``1`` = retained). The format is detected from
-   the content of the file. This is the ``--witchi_info_file`` input of ``msa_filter``.
+   Columns removed from the full alignment before trimming (e.g. by WitChi); the alignment must contain only the
+   retained columns. Either a :ref:`WitChi pruned TSV <files/witchi.tsv>` giving the 0-based index of each removed
+   column in an ``Original Index`` column, or a :ref:`binary mask <files/mask>` as used by :ref:`commands/mask` (a
+   single line of 0s and 1s, one per column, ``1`` = retained). The format is detected from the content of the
+   file. This is the ``--witchi_info_file`` input of ``msa_filter``.
 
    The mask must have one column for each column described by the marker info file, and the number of columns it
    retains must equal the length of the alignment. The output masks are over the full alignment.
