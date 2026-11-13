@@ -1,5 +1,8 @@
 <p align="center">
-  <img src="docs/src/_static/gtrim_mark.svg" alt="gTrim logo" width="160">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="docs/src/_static/gtrim_stacked_dark.svg">
+    <img src="docs/src/_static/gtrim_stacked.svg" alt="gTrim" width="220">
+  </picture>
 </p>
 
 # gTrim
