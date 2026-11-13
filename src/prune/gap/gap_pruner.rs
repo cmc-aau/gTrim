@@ -18,6 +18,8 @@ struct PerColStats {
 pub struct GapPruner {
     alignment_file: String,
     gap_threshold: f64,
+    // not yet used: --max-residue-pruned has no effect on gap pruning
+    #[allow(dead_code)]
     max_residue_pruned: usize,
     out_dir: String,
 }
@@ -55,19 +57,16 @@ impl GapPruner {
         info!("Pruned {} columns.", mask.iter().filter(|&state| !state).count());
 
         // write results to output files
-        let output_prefix = get_output_prefix(&self.alignment_file, &self.out_dir)?;
-        let output_suffix = format!("_gt{}_m{}_pruned.fasta", self.gap_threshold, self.max_residue_pruned);
+        let output_prefix = format!("{}.pruned", get_output_prefix(&self.alignment_file, &self.out_dir)?);
 
-        let output_stats_file = output_suffix.replace(".fasta", ".tsv");
-        let output_stats_file = format!("{}{}", output_prefix, output_stats_file);
+        let output_stats_file = format!("{}.tsv", output_prefix);
         self.write_gap_stats(&col_stats, &mask, &output_stats_file)?;
 
-        let output_mask_file = output_suffix.replace(".fasta", ".mask");
-        let output_mask_file = format!("{}{}", output_prefix, output_mask_file);
+        let output_mask_file = format!("{}.mask", output_prefix);
         write_mask(&mask, &output_mask_file)?;
 
         info!("Writing filtered alignment to file.");
-        let output_alignment_file = format!("{}{}", output_prefix, output_suffix);
+        let output_alignment_file = format!("{}.fasta", output_prefix);
         let compressed = check_compressed_input(&self.alignment_file);
         write_filtered_alignment(&seq_ids, &alignment_array, &mask, &output_alignment_file, compressed)?;
 

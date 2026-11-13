@@ -244,20 +244,16 @@ impl MsaTrimmer {
         }
 
         // write results
-        let output_prefix = get_output_prefix(&self.alignment_file, &self.out_dir)?;
-        let output_suffix = format!(
-            "_l{}_aa{}_c{}-{}_trimmed.fasta",
-            self.msa_length, self.min_perc_aa, self.min_consensus, self.max_consensus
-        );
-        let output_file = |ext: &str| format!("{}{}", output_prefix, output_suffix.replace(".fasta", ext));
+        let output_prefix = format!("{}.trimmed", get_output_prefix(&self.alignment_file, &self.out_dir)?);
+        let output_file = |ext: &str| format!("{}{}", output_prefix, ext);
 
-        write_mask(&filtered_mask, &output_file("_filtered.mask"))?;
+        write_mask(&filtered_mask, &output_file(".filtered.mask"))?;
         write_mask(&final_mask, &output_file(".mask"))?;
-        self.write_marker_stats(&markers, &filter_info, &output_file("_markers.tsv"))?;
-        self.write_genome_stats(&seq_ids, &alignment, &sampled_cols, &output_file("_genomes.tsv"))?;
+        self.write_marker_stats(&markers, &filter_info, &output_file(".markers.tsv"))?;
+        self.write_genome_stats(&seq_ids, &alignment, &sampled_cols, &output_file(".genomes.tsv"))?;
 
         info!("Writing trimmed alignment to file.");
-        let output_alignment_file = format!("{}{}", output_prefix, output_suffix);
+        let output_alignment_file = output_file(".fasta");
         let compressed = check_compressed_input(&self.alignment_file);
         write_filtered_alignment(&seq_ids, &alignment, &final_mask, &output_alignment_file, compressed)?;
 

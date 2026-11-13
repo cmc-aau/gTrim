@@ -49,7 +49,7 @@ impl ColumnStats {
 
         // write results to output files
         let output_prefix = get_output_prefix(&self.alignment_file, &self.out_dir)?;
-        let output_suffix = "_column_stats.tsv";
+        let output_suffix = ".column_stats.tsv";
 
         let output_stats_file = format!("{}{}", output_prefix, output_suffix);
         self.write_column_stats(&col_stats, &output_stats_file)?;
