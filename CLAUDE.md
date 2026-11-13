@@ -25,6 +25,8 @@ cargo run --release -- trim -i tests/input_file/trim_test.faa.gz -m tests/input_
 
 `src/cli.rs` is the source of truth for options.
 
+Documentation (Sphinx, `sphinx_rtd_theme`, styled like gTranslate's docs) is in `docs/src/` and is published to https://cmc-aau.github.io/gTrim/ by `.github/workflows/docs.yml` (pushes the build to the `gh_pages` branch). Command options are written by hand in `docs/src/commands/*.rst` with `.. option::` directives, so any change to `src/cli.rs`, output files or log messages must also be made there and in `docs/src/files/`. The version is read from `Cargo.toml`; `{{ gtrim_version }}` in a page is replaced with it. The changelog page includes `CHANGELOG.md`. Build locally with `make html SPHINXOPTS="-W --keep-going"` in `docs/` (requires the packages in `docs/requirements.txt`). The logo files (`gtrim_mark.svg`, `gtrim_icon.svg`, `gtrim_lockup.svg`, `gtrim_stacked.svg`, `gtrim_wordmark.svg`, `gtrim_favicon.png`) are in `docs/src/_static/`; they follow the gTranslate logo (same wordmark letters, palette and red #A33A2C), with "Trim" in burnt orange #C1561B.
+
 ## Workflow rules
 
 - **Pull requests:** every PR must bump the version in `Cargo.toml` (which also changes the `--version` output and the version logged at startup) and add an entry for that version to `CHANGELOG.md`. Create `CHANGELOG.md` if it doesn't exist yet.

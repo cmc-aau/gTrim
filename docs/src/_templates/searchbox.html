@@ -1,0 +1,7 @@
+{# Show the version directly above the search bar #}
+{%- if version %}
+<div class="version" style="text-align: center; margin-top: 10px; margin-bottom: 10px; font-weight: bold;">
+  v{{ version }}
+</div>
+{%- endif %}
+{%- include "!searchbox.html" %}
