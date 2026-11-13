@@ -219,15 +219,22 @@ impl MsaTrimmer {
         }
 
         // randomly subsample columns from each marker
-        info!("Randomly subsampling columns to obtain an MSA of ~{} columns (seed = {}).", self.msa_length, self.seed);
         let cols_per_marker = columns_per_marker(&retained_counts, self.msa_length);
         let sampled_cols = self.subsample_columns(&mut filter_info, cols_per_marker);
-        info!("Sampling up to {} columns from each marker.", cols_per_marker);
-        info!(
-            "{} markers had fewer than {} columns available for sampling.",
-            retained_counts.iter().filter(|&&n| n < cols_per_marker).count(),
-            cols_per_marker
-        );
+        if total_retained <= self.msa_length {
+            info!(
+                "MSA length ({}) is not less than the number of retained columns; retaining all {} columns.",
+                self.msa_length, total_retained
+            );
+        } else {
+            info!("Randomly subsampling columns to obtain an MSA of ~{} columns (seed = {}).", self.msa_length, self.seed);
+            info!("Sampling up to {} columns from each marker.", cols_per_marker);
+            info!(
+                "{} markers had fewer than {} columns available for sampling.",
+                retained_counts.iter().filter(|&&n| n < cols_per_marker).count(),
+                cols_per_marker
+            );
+        }
         info!("Trimmed MSA has {} columns.", sampled_cols.len());
 
         let filtered_mask: Vec<bool> = classes.iter().map(|&c| c == ColumnClass::Retained).collect();

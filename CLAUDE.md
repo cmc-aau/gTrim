@@ -16,7 +16,7 @@ cargo test test_verify_cli            # one test by name (clap CLI consistency c
 cargo clippy
 ```
 
-Subcommands: `prune-gap`, `mask`, `column-stats`, `trim`. All take a single MSA via `-i/--alignment-file` and `-o/--out-dir`; `trim` also requires `-m/--marker-info-file`. Examples:
+Subcommands: `prune-gap`, `trim`, `mask`, `column-stats`. All take a single MSA via `-i/--alignment-file` and `-o/--out-dir`; `trim` also requires `-m/--marker-info-file`. Examples:
 
 ```bash
 cargo run --release -- prune-gap -i tests/input_file/gap_test.fna.gz -o out/ --gap-threshold 50
@@ -34,7 +34,7 @@ cargo run --release -- trim -i tests/input_file/trim_test.faa.gz -m tests/input_
 ## Architecture
 
 - `main.rs` dispatches each subcommand. A shared `init()` creates the output directory, sets up log4rs logging to stderr and `<out_dir>/gtrim.log`, and builds the **global** rayon thread pool.
-- Every command module (`prune/gap`, `prune/mask`, `prune/trim`, `stats`) follows the same pattern:
+- Every command module (`prune/gap`, `prune/trim`, `prune/mask`, `stats`) follows the same pattern:
   1. `Struct::new(...)` is followed by `run()`.
   2. `run()` reads the alignment through `AlignmentReader` into `(Vec<String> ids, Array2<u8>)` (rows = sequences, columns = alignment positions, residues as uppercased ASCII bytes). The reader appends every sequence to one row-major buffer that becomes the array's storage, so the alignment costs one byte per cell and is never copied. Keep it that way: don't introduce per-sequence `Vec`s or `char` arrays, and use byte literals (`b'-'`, `*b"ACGT"`) for residue constants.
   3. It calls `SequenceTypeDetector::detect` to choose DNA or amino acids. Unknown characters default to amino acids.
@@ -49,9 +49,9 @@ cargo run --release -- trim -i tests/input_file/trim_test.faa.gz -m tests/input_
 
 - `marker_info.rs` reads the marker info file. Header names are matched case-insensitively, so both `Marker Id` (GTDB) and `Marker ID` (GTDB-Tk) work. The marker lengths must sum to the alignment length.
 - `msa_trimmer.rs` summarises columns with `map_column_counts`. Gaps are `-`, `.`, `_`, `*` (`TRIM_GAP_CHARS`, which differs from `GAP_CHARS` in `sequence_type_detector.rs`). A column is gappy if more than (100 − `--min-perc-aa`)% of sequences have a gap, or all do. Otherwise consensus is the count of the most common residue divided by the number of non-gap characters: below `--min-consensus` is unconserved, at or above `--max-consensus` is conserved. The fractions are computed exactly as in the Python code so that the filtered mask is identical.
-- Subsampling takes the smallest k for which the sum over markers of min(retained columns, k) reaches `--msa-length`, then samples min(k, retained) columns from each marker with a `ChaCha8Rng` seeded by `--seed`, one RNG used across markers in order. Output does not depend on the thread count.
+- Subsampling takes the smallest k for which the sum over markers of min(retained columns, k) reaches `--msa-length`, then samples min(k, retained) columns from each marker with a `ChaCha8Rng` seeded by `--seed` (default 42), one RNG used across markers in order. Output does not depend on the thread count. The default `--msa-length` is 1,000,000, so by default every retained column is kept unless more than that pass the filters; `msa_filter`'s default is 5000.
 - Intentional differences from `msa_filter`: sampling is seeded (Python is unseeded), so the sampled columns differ but the number per marker is the same; if `--msa-length` cannot be reached, every retained column is used (Python caps k at 999); a run with no retained columns is an error; residues in `_genomes.tsv` are ASCII letters, as in Python's `isalpha()`. `--min-perc-aa` filters columns, not genomes, despite the wording of the Python help text.
-- Verified against `msa_filter` on `test_sets/gtdb_n5000_test` (bac120 r226 markers info built from the GTDB-Tk r226 HMMs) with the defaults and with `--msa-length 12000 --min-perc-aa 70 --min-consensus 10 --max-consensus 90`: identical filtered masks, per-marker counts and sampled columns per marker. 2 s versus 26 s for Python. On `gtdb_n10000_test` (10,000 × 41,084), 2.1 s and 0.42 GB peak RSS with 16 threads (4.1 s and 3.2 GB before 0.5.0 stored residues as bytes). Nearly all of the remaining time is single-threaded gzip decompression of the input.
+- Verified against `msa_filter` on `test_sets/gtdb_n5000_test` (bac120 r226 markers info built from the GTDB-Tk r226 HMMs) with `--msa-length 5000` and with `--msa-length 12000 --min-perc-aa 70 --min-consensus 10 --max-consensus 90`: identical filtered masks, per-marker counts and sampled columns per marker. 2 s versus 26 s for Python. On `gtdb_n10000_test` (10,000 × 41,084), 2.1 s and 0.42 GB peak RSS with 16 threads (4.1 s and 3.2 GB before 0.5.0 stored residues as bytes). Nearly all of the remaining time is single-threaded gzip decompression of the input.
 
 ## Tests
 

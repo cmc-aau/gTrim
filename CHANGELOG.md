@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.6.0
+
+### Changed
+
+- Subcommands are listed in the order `prune-gap`, `trim`, `mask`, `column-stats`.
+- `trim`: the default `--msa-length` is now 1000000, so by default every column passing the filters is retained and no subsampling is done (unless more than 1,000,000 columns pass). Pass `--msa-length 5000` for the previous behaviour, which matches GenomeTreeTk `msa_filter`.
+- `trim`: the default `--seed` is now 42 (was 12345). The `trim` test ground truth was regenerated; the filtered columns are unchanged.
+
 ## 0.5.0
 
 ### Changed

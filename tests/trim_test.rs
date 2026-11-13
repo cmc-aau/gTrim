@@ -7,7 +7,8 @@ use test_utils::{compare_fasta_files, compare_mask_files, compare_tsv_files};
 
 // Test data: the first 200 genomes and first 10 bac120 markers (1,792 columns) of
 // test_sets/gtdb_n5000_test/gtdb_r226_n5000.faa.gz. The filtered mask and marker statistics
-// match GenomeTreeTk `msa_filter` (no WitChi file) with --msa_length 500.
+// match GenomeTreeTk `msa_filter` (no WitChi file) with --msa_length 500. Sampled columns use the
+// default seed (42).
 #[test]
 fn test_trim() {
     let temp_dir = tempdir().unwrap();
