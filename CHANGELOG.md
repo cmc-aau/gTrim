@@ -1,5 +1,23 @@
 # Changelog
 
+## 0.5.0
+
+### Changed
+
+- Alignments are stored as `Array2<u8>` (one byte per residue) instead of `Array2<char>`. The reader appends each sequence to a single buffer that becomes the array's storage, rather than collecting a `Vec<Vec<char>>` and copying it into the array, which kept two 4-byte copies of every residue in memory at once. Peak memory drops by about 8× for every command. On `test_sets/gtdb_n10000_test` (10,000 × 41,084, 16 threads), measured with `/usr/bin/time -v`:
+
+  | Command | Peak RSS before → after | Wall time before → after |
+  | --- | --- | --- |
+  | `trim` | 3.25 GB → 0.42 GB | 4.1 s → 2.1 s |
+  | `prune-gap --gap-threshold 50` | 3.25 GB → 0.43 GB | 14.9 s → 3.1 s |
+  | `mask` | 3.25 GB → 0.41 GB | 5.1 s → 2.8 s |
+  | `column-stats` | 3.25 GB → 0.43 GB | 19.4 s → 3.0 s |
+
+  The output files of `trim`, `prune-gap` and `mask` are byte-identical to 0.4.0.
+- `prune-gap` and `column-stats` count residues over blocks of adjacent columns in parallel (new `column_counts` module, shared with `trim`) instead of walking the alignment one column at a time.
+- `column-stats` lists residues with equal counts in character order. Previously their order depended on hash map iteration and could change between runs. Its TSV is now written through a buffered writer.
+- Non-ASCII bytes in an alignment are written back out unchanged. Previously each was treated as a Latin-1 character and written as UTF-8.
+
 ## 0.4.0
 
 ### Added

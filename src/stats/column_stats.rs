@@ -1,6 +1,5 @@
 use std::fs::File;
-use std::io::Write;
-use std::collections::{HashSet, HashMap};
+use std::io::{BufWriter, Write};
 
 use anyhow::{Context, Result};
 use log::info;
@@ -8,12 +7,14 @@ use ndarray::Array2;
 
 use crate::sequence_type_detector::{GAP_CHARS, SequenceTypeDetector};
 use crate::alignment_reader::AlignmentReader;
+use crate::column_counts::map_column_counts;
 use crate::alignment_writer::get_output_prefix;
 
 #[derive(Default, Clone)]
 struct PerColStats {
     gap_count: usize,
-    residue_counts: HashMap<char, usize>,
+    /// Non-gap residues and their counts, most common first (ties in character code order).
+    residue_counts: Vec<(u8, usize)>,
     column_len: usize,
 }
 pub struct ColumnStats {
@@ -56,36 +57,34 @@ impl ColumnStats {
         Ok(())
     }
 
-    /// Determine gap statistics for each column in alignment.
-    fn calculate_columns_stats(&self, alignment_array: &Array2<char>) -> Vec<PerColStats> {
-        let gaps: HashSet<char> = HashSet::from_iter(GAP_CHARS.iter().copied());
-        let mut gap_stats = Vec::with_capacity(alignment_array.ncols());
-        for col_idx in 0..alignment_array.ncols() {
-            let column = alignment_array.column(col_idx);
-            
+    /// Determine gap and residue statistics for each column in alignment.
+    fn calculate_columns_stats(&self, alignment_array: &Array2<u8>) -> Vec<PerColStats> {
+        let column_len = alignment_array.nrows();
+        map_column_counts(alignment_array, |counts| {
             let mut gap_count = 0;
-            let mut residue_counts = HashMap::new();
-            for ch in column.iter() {
-                if gaps.contains(ch) {
-                    gap_count += 1;
-                } else {
-                    *residue_counts.entry(*ch).or_insert(0) += 1;
+            let mut residue_counts = Vec::new();
+            for (code, &n) in counts.iter().enumerate() {
+                let code = code as u8;
+                if GAP_CHARS.contains(&code) {
+                    gap_count += n as usize;
+                } else if n > 0 {
+                    residue_counts.push((code, n as usize));
                 }
             }
+            residue_counts.sort_by(|a, b| b.1.cmp(&a.1));
 
-            gap_stats.push(PerColStats { 
-                gap_count, 
+            PerColStats {
+                gap_count,
                 residue_counts,
-                column_len: column.len(),
-            });
-        }
-        
-        gap_stats
+                column_len,
+            }
+        })
     }
 
     /// Write column statistics.
     fn write_column_stats(&self, col_stats: &[PerColStats], out_file: &str) -> Result<()> {
-        let mut file = File::create(out_file).with_context(|| format!("Failed to create file: {}", out_file))?;
+        let file = File::create(out_file).with_context(|| format!("Failed to create file: {}", out_file))?;
+        let mut file = BufWriter::new(file);
 
         writeln!(file, "column_idx\tnum_gaps\tgap_perc\tnum_residues\tresidue_perc\tper_residue_counts\tper_residue_perc")?;
         for (col_idx, cur_col_stats) in col_stats.iter().enumerate() {
@@ -93,18 +92,17 @@ impl ColumnStats {
             let num_residues = cur_col_stats.column_len - cur_col_stats.gap_count;
             let residue_perc = (num_residues as f64 / cur_col_stats.column_len as f64) * 100.0;
 
-            let mut sorted_residues: Vec<(&char, &usize)> = cur_col_stats.residue_counts.iter().collect();
-            sorted_residues.sort_by(|a, b| b.1.cmp(a.1));
-
-            let residue_counts_str = sorted_residues
+            let residue_counts_str = cur_col_stats
+                .residue_counts
                 .iter()
-                .map(|(res, count)| format!("{}:{}", res, count))
+                .map(|&(res, count)| format!("{}:{}", res as char, count))
                 .collect::<Vec<String>>()
                 .join(",");
 
-            let residue_perc_str = sorted_residues
-                .into_iter()
-                .map(|(res, count)| format!("{}:{:.2}", res, (*count as f64 / cur_col_stats.column_len as f64) * 100.0))
+            let residue_perc_str = cur_col_stats
+                .residue_counts
+                .iter()
+                .map(|&(res, count)| format!("{}:{:.2}", res as char, (count as f64 / cur_col_stats.column_len as f64) * 100.0))
                 .collect::<Vec<String>>()
                 .join(",");
 
@@ -117,6 +115,8 @@ impl ColumnStats {
                             residue_counts_str,
                             residue_perc_str)?;
         }
+
+        file.flush()?;
 
         Ok(())
     }

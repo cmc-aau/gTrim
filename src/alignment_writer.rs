@@ -66,23 +66,21 @@ pub fn create_writer(out_file: &str, compress: bool) -> Result<(Box<dyn Write>, 
 /// Write filtered alignment to FASTA file.
 pub fn write_filtered_alignment(
     seq_ids: &[String],
-    alignment_array: &Array2<char>,
+    alignment_array: &Array2<u8>,
     mask: &[bool],
     out_file: &str,
     compress: bool,
 ) -> Result<()> {
     let (mut writer, _) = create_writer(out_file, compress)?;
 
-    for (row_idx, id) in seq_ids.iter().enumerate() {
+    let kept_cols: Vec<usize> = (0..mask.len()).filter(|&i| mask[i]).collect();
+    let mut seq = Vec::with_capacity(kept_cols.len() + 1);
+    for (row, id) in alignment_array.rows().into_iter().zip(seq_ids) {
         writeln!(writer, ">{}", id)?;
-        let seq: String = alignment_array
-            .row(row_idx)
-            .iter()
-            .copied()
-            .enumerate()
-            .filter_map(|(i, ch)| if mask[i] { Some(ch) } else { None })
-            .collect();
-        writeln!(writer, "{}", seq)?;
+        seq.clear();
+        seq.extend(kept_cols.iter().map(|&i| row[i]));
+        seq.push(b'\n');
+        writer.write_all(&seq)?;
     }
 
     writer.flush()?;
