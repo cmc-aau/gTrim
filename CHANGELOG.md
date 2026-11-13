@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.7.1
+
+### Added
+
+- Sphinx documentation in `docs/`, in the style of the gTranslate documentation, covering installation, each command and its options, the input and output files, how `trim` works and how it differs from GenomeTreeTk `msa_filter`, an FAQ, references, and this changelog. The version shown is read from `Cargo.toml`. Build it with `make html` in `docs/` (requirements in `docs/requirements.txt`).
+- gTrim logo in the style of the gTranslate logo: nine alignment rows whose columns share one colour per nucleotide, with red bars marking the filtered columns, and a "gTrim" wordmark. The files (mark, icon, horizontal and stacked lockups, wordmark and favicon) are in `docs/src/_static/`; the stacked lockup and favicon are used by the documentation and the mark heads the README.
+- GitHub Actions workflow (`.github/workflows/docs.yml`) that builds the documentation on every push to `main` and publishes it to the `gh_pages` branch for GitHub Pages at https://cmc-aau.github.io/gTrim/.
+
+### Changed
+
+- The README states more prominently that gTrim is a work in progress and links to the documentation.
+
 ## 0.7.0
 
 ### Changed

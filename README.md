@@ -1,8 +1,15 @@
+<p align="center">
+  <img src="docs/src/_static/gtrim_mark.svg" alt="gTrim logo" width="160">
+</p>
+
 # gTrim
 
-[Work in Progress. In Active Development. Recommend contacting Donovan before use.]
+> [!WARNING]
+> **gTrim is a work in progress.** It is in active development, and its commands, options and output files may change between versions. Please contact Donovan Parks before using gTrim in your work.
 
 Toolkit for pruning multiple sequence alignments.
+
+Documentation for gTrim can be found [here](https://cmc-aau.github.io/gTrim/).
 
 ## Functionality
 
