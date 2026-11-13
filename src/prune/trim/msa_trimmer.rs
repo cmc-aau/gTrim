@@ -4,24 +4,22 @@ use std::io::{BufWriter, Write};
 
 use anyhow::{Context, Result, bail};
 use log::{info, warn};
-use ndarray::{Array2, s};
+use ndarray::Array2;
 use rand::SeedableRng;
 use rand::seq::index::sample;
 use rand_chacha::ChaCha8Rng;
 use rayon::prelude::*;
 
 use crate::alignment_reader::AlignmentReader;
+use crate::column_counts::map_column_counts;
 use crate::alignment_writer::{check_compressed_input, get_output_prefix, write_filtered_alignment, write_mask};
 use crate::prune::trim::marker_info::{MarkerInfo, read_marker_info};
 use crate::sequence_type_detector::SequenceTypeDetector;
 
 /// Characters treated as gaps (matches GenomeTreeTk `msa_filter`).
-pub const TRIM_GAP_CHARS: [char; 4] = ['-', '.', '_', '*'];
+pub const TRIM_GAP_CHARS: [u8; 4] = *b"-._*";
 
-/// Number of adjacent columns summarised together, so each sequence is read in contiguous blocks.
-const COL_BLOCK: usize = 64;
-
-fn is_gap(c: char) -> bool {
+fn is_gap(c: u8) -> bool {
     TRIM_GAP_CHARS.contains(&c)
 }
 
@@ -38,7 +36,7 @@ pub enum ColumnClass {
 #[derive(Debug, Clone, PartialEq)]
 pub struct ColumnSummary {
     pub num_gaps: usize,
-    pub top_residue: Option<char>,
+    pub top_residue: Option<u8>,
     pub top_residue_count: usize,
 }
 
@@ -81,59 +79,28 @@ impl ColumnFilter {
     }
 }
 
-/// Summarise each column of the alignment, in parallel over blocks of columns.
-pub fn summarise_columns(alignment: &Array2<char>) -> Vec<ColumnSummary> {
-    let ncols = alignment.ncols();
-    let blocks: Vec<usize> = (0..ncols).step_by(COL_BLOCK).collect();
+/// Summarise each column of the alignment.
+pub fn summarise_columns(alignment: &Array2<u8>) -> Vec<ColumnSummary> {
+    map_column_counts(alignment, |counts| {
+        let num_gaps = TRIM_GAP_CHARS.iter().map(|&g| counts[g as usize] as usize).sum();
 
-    blocks
-        .par_iter()
-        .map(|&start| summarise_block(alignment, start, (start + COL_BLOCK).min(ncols)))
-        .collect::<Vec<_>>()
-        .into_iter()
-        .flatten()
-        .collect()
-}
-
-fn summarise_block(alignment: &Array2<char>, start: usize, end: usize) -> Vec<ColumnSummary> {
-    let width = end - start;
-    let mut num_gaps = vec![0usize; width];
-    let mut ascii_counts = vec![[0u32; 128]; width];
-    let mut other_counts: HashMap<(usize, char), usize> = HashMap::new();
-
-    for row in alignment.rows() {
-        for (j, &c) in row.slice(s![start..end]).iter().enumerate() {
-            if is_gap(c) {
-                num_gaps[j] += 1;
-            } else if c.is_ascii() {
-                ascii_counts[j][c as usize] += 1;
-            } else {
-                *other_counts.entry((j, c)).or_default() += 1;
+        // most common residue; ties are broken by the lowest character code
+        let mut top_residue = None;
+        let mut top_residue_count = 0;
+        for (code, &n) in counts.iter().enumerate() {
+            let n = n as usize;
+            if n > top_residue_count && !is_gap(code as u8) {
+                top_residue = Some(code as u8);
+                top_residue_count = n;
             }
         }
-    }
 
-    (0..width)
-        .map(|j| {
-            // most common residue; ties are broken by the lowest character code
-            let mut top_residue = None;
-            let mut top_residue_count = 0;
-            let ascii = ascii_counts[j].iter().enumerate().map(|(code, &n)| (code as u8 as char, n as usize));
-            let other = other_counts.iter().filter(|((col, _), _)| *col == j).map(|((_, c), &n)| (*c, n));
-            for (c, n) in ascii.chain(other) {
-                if n > top_residue_count || (n == top_residue_count && n > 0 && Some(c) < top_residue) {
-                    top_residue = Some(c);
-                    top_residue_count = n;
-                }
-            }
-
-            ColumnSummary {
-                num_gaps: num_gaps[j],
-                top_residue,
-                top_residue_count,
-            }
-        })
-        .collect()
+        ColumnSummary {
+            num_gaps,
+            top_residue,
+            top_residue_count,
+        }
+    })
 }
 
 /// Smallest number of columns to sample from each marker that gives an alignment of at least
@@ -329,8 +296,8 @@ impl MsaTrimmer {
     }
 
     /// Warn about columns whose most common residue is not a standard residue.
-    fn report_nonstandard_consensus(&self, summaries: &[ColumnSummary], classes: &[ColumnClass], alphabet: &[char]) {
-        let mut nonstandard: HashMap<char, usize> = HashMap::new();
+    fn report_nonstandard_consensus(&self, summaries: &[ColumnSummary], classes: &[ColumnClass], alphabet: &[u8]) {
+        let mut nonstandard: HashMap<u8, usize> = HashMap::new();
         for (summary, class) in summaries.iter().zip(classes) {
             if *class == ColumnClass::Gappy {
                 continue;
@@ -341,10 +308,10 @@ impl MsaTrimmer {
         }
 
         if !nonstandard.is_empty() {
-            let mut counts: Vec<(char, usize)> = nonstandard.into_iter().collect();
+            let mut counts: Vec<(u8, usize)> = nonstandard.into_iter().collect();
             counts.sort();
             let total: usize = counts.iter().map(|(_, n)| n).sum();
-            let counts: Vec<String> = counts.iter().map(|(c, n)| format!("{}:{}", c, n)).collect();
+            let counts: Vec<String> = counts.iter().map(|&(c, n)| format!("{}:{}", c as char, n)).collect();
             warn!(
                 "Most common residue was not in the standard alphabet in {} columns ({}).",
                 total,
@@ -388,7 +355,7 @@ impl MsaTrimmer {
     }
 
     /// Write the number of residues each sequence has in the trimmed alignment.
-    fn write_genome_stats(&self, seq_ids: &[String], alignment: &Array2<char>, sampled_cols: &[usize], out_file: &str) -> Result<()> {
+    fn write_genome_stats(&self, seq_ids: &[String], alignment: &Array2<u8>, sampled_cols: &[usize], out_file: &str) -> Result<()> {
         let residue_counts: Vec<usize> = (0..alignment.nrows())
             .into_par_iter()
             .map(|row_idx| {
@@ -426,32 +393,29 @@ mod tests {
     fn summary(num_gaps: usize, top_residue_count: usize) -> ColumnSummary {
         ColumnSummary {
             num_gaps,
-            top_residue: Some('A'),
+            top_residue: Some(b'A'),
             top_residue_count,
         }
     }
 
     #[test]
     fn test_summarise_columns() {
-        let alignment = arr2(&[
-            ['A', '-', 'C', '*'],
-            ['A', '.', 'D', '_'],
-            ['C', 'K', 'D', '-'],
-            ['A', 'K', 'C', 'X'],
-        ]);
+        let alignment = arr2(&[*b"A-C*", *b"A.D_", *b"CKD-", *b"AKCX"]);
         let summaries = summarise_columns(&alignment);
 
-        assert_eq!(summaries[0], ColumnSummary { num_gaps: 0, top_residue: Some('A'), top_residue_count: 3 });
-        assert_eq!(summaries[1], ColumnSummary { num_gaps: 2, top_residue: Some('K'), top_residue_count: 2 });
+        assert_eq!(summaries[0], ColumnSummary { num_gaps: 0, top_residue: Some(b'A'), top_residue_count: 3 });
+        assert_eq!(summaries[1], ColumnSummary { num_gaps: 2, top_residue: Some(b'K'), top_residue_count: 2 });
         // tie between C and D is broken by the lowest character code
-        assert_eq!(summaries[2], ColumnSummary { num_gaps: 0, top_residue: Some('C'), top_residue_count: 2 });
-        assert_eq!(summaries[3], ColumnSummary { num_gaps: 3, top_residue: Some('X'), top_residue_count: 1 });
+        assert_eq!(summaries[2], ColumnSummary { num_gaps: 0, top_residue: Some(b'C'), top_residue_count: 2 });
+        assert_eq!(summaries[3], ColumnSummary { num_gaps: 3, top_residue: Some(b'X'), top_residue_count: 1 });
     }
 
     #[test]
     fn test_summarise_columns_multiple_blocks() {
+        use crate::column_counts::COL_BLOCK;
+
         let ncols = 2 * COL_BLOCK + 5;
-        let alignment = Array2::from_shape_fn((3, ncols), |(r, c)| if r == 0 && c % 2 == 0 { '-' } else { 'L' });
+        let alignment = Array2::from_shape_fn((3, ncols), |(r, c)| if r == 0 && c % 2 == 0 { b'-' } else { b'L' });
         let summaries = summarise_columns(&alignment);
 
         assert_eq!(summaries.len(), ncols);

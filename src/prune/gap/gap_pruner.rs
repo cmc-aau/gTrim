@@ -1,6 +1,5 @@
 use std::fs::File;
 use std::io::Write;
-use std::collections::HashSet;
 
 use anyhow::{Context, Result};
 use log::info;
@@ -8,6 +7,7 @@ use ndarray::Array2;
 
 use crate::sequence_type_detector::{GAP_CHARS, SequenceTypeDetector};
 use crate::alignment_reader::AlignmentReader;
+use crate::column_counts::map_column_counts;
 use crate::alignment_writer::{get_output_prefix, check_compressed_input, write_filtered_alignment, write_mask};
 
 #[derive(Default, Clone)]
@@ -75,18 +75,13 @@ impl GapPruner {
     }
 
     /// Determine gap statistics for each column in alignment.
-    fn calculate_gap_stats(&self, alignment_array: &Array2<char>) -> Vec<PerColStats> {
-        let gaps: HashSet<char> = HashSet::from_iter(GAP_CHARS.iter().copied());
+    fn calculate_gap_stats(&self, alignment_array: &Array2<u8>) -> Vec<PerColStats> {
         let num_rows = alignment_array.nrows() as f64;
-        let mut gap_stats = Vec::with_capacity(alignment_array.ncols());
-        for col_idx in 0..alignment_array.ncols() {
-            let column = alignment_array.column(col_idx);
-            let num_gaps = column.iter().filter(|&&c| gaps.contains(&c)).count();
+        map_column_counts(alignment_array, |counts| {
+            let num_gaps: usize = GAP_CHARS.iter().map(|&g| counts[g as usize] as usize).sum();
             let gap_perc = (num_gaps as f64 / num_rows) * 100.0;
-            gap_stats.push(PerColStats { num_gaps, gap_perc });
-        }
-        
-        gap_stats
+            PerColStats { num_gaps, gap_perc }
+        })
     }
 
     /// Filter columns that exceed the gap threshold.
@@ -126,12 +121,7 @@ mod tests {
 
     #[test]
     fn test_calculate_gap_statistics() {
-        let alignment_array = arr2(&[
-            ['A', 'A', '-', 'G'],
-            ['A', '-', '-', 'G'],
-            ['C', 'T', 'A', 'G'],
-            ['-', 'T', 'C', 'G'],
-        ]);
+        let alignment_array = arr2(&[*b"AA-G", *b"A--G", *b"CTAG", *b"-TCG"]);
         let pruner = create_pruner();
         let stats = pruner.calculate_gap_stats(&alignment_array);
 
